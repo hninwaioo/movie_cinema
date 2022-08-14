@@ -1,0 +1,14 @@
+import 'package:flutter/material.dart';
+
+const PRIMARY_COLOR = Color.fromRGBO(19, 19, 19, 1.0);
+const CITIES_BACKGROUND_COLOR = Color.fromRGBO(56,56,56,1.0);
+const SIGN_PHONE_NUMBER_BUTTON_COLOR = Color.fromRGBO(0,255,106,1.0);
+
+const HOME_SCREEN_BANNER_DOTS_INACTIVE_COLOR = Color.fromRGBO(50,50,50,1.0);
+const PRIMARY_HINT_COLOR = Color.fromRGBO(136, 136, 136, 1.0);
+
+const PLAY_BUTTON_COLOR = Color.fromRGBO(233, 189, 68, 1.0);
+const HOME_SCREEN_BACKGROUND_COLOR = Color.fromRGBO(30, 31, 48, 1.0);
+const HOME_SCREEN_LIST_TITLE_COLOR = Color.fromRGBO(80, 87, 101, 1.0);
+const MOVIE_DETAILS_SCREEN_CHIP_BACKGROUND_COLOR = Color.fromRGBO(36, 42, 49, 1.0);
+const MOVIE_DETAIL_INFO_TEXT = Color.fromRGBO(58, 62, 71, 1.0);

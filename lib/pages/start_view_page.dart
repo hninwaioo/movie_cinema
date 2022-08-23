@@ -1,6 +1,5 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
-
 import '../resources/colors.dart';
 import '../viewsitems/first_banner_view.dart';
 

@@ -37,6 +37,8 @@ dependencies:
   flutter_rating_bar: ^4.0.1
   dots_indicator: ^2.1.0
   intl_phone_field: ^3.1.0
+  flutter_svg: ^1.1.3
+  dotted_line: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -64,6 +66,43 @@ flutter:
   assets:
      - assets/images/main_logo.png
      - assets/images/logo_icon.png
+     - assets/images/pick_region.png
+     - assets/images/location_arrow.png
+     - assets/images/cities_icon.png
+     - assets/images/nav_video.png
+     - assets/images/nav_ticket.png
+     - assets/images/nav_cinema.png
+     - assets/images/nav_profile.png
+     - assets/images/scan_icon.png
+     - assets/images/debit_card.png
+     - assets/images/images_im.png
+     - assets/images/ellipse.png
+     - assets/images/play_button.png
+     - assets/images/booking_btn.png
+     - assets/images/google_icon.png
+     - assets/images/parking_icon.png
+     - assets/images/online_food_icon.png
+     - assets/images/wheel_chair_icon.png
+     - assets/images/message_bg.png
+     - assets/images/food_cancel_icon.png
+     - assets/images/cancel_book_button.png
+     - assets/images/profile_background.png
+     - assets/images/login_sign_in.png
+     - assets/images/profile_circle.png
+     - assets/images/purchase_history.png
+     - assets/images/offer_icon.png
+     - assets/images/location_icon.png
+     - assets/images/payment_icon.png
+     - assets/images/help_support_icon.png
+     - assets/images/logout_icon.png
+     - assets/images/gift_card_icon.png
+     - assets/images/down_arrow_icon.png
+     - assets/images/potato_chip.png
+     - assets/images/right_arrow_icon.png
+     - assets/images/plus_icon.png
+     - assets/images/minus_icon.png
+     - assets/images/continue_icon.png
+
 
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

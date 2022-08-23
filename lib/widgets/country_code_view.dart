@@ -12,7 +12,7 @@ class PhoneNumberCodeSectionView extends StatelessWidget {
         Container(
           child: IntlPhoneField(
             showDropdownIcon: true,
-        dropdownIconPosition : IconPosition.trailing,
+            dropdownIconPosition : IconPosition.trailing,
             decoration: InputDecoration(
               // labelText: 'Mobile Number',
               // border: OutlineInputBorder(
@@ -25,7 +25,6 @@ class PhoneNumberCodeSectionView extends StatelessWidget {
             onCountryChanged: (country) {
               print('Country changed to: ' + country.name);
             },
-
           ),
         )
       ],

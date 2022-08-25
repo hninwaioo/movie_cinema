@@ -89,9 +89,10 @@ class MovieDetailsSliverAppBarView extends StatelessWidget {
             /** Positioned WIdget **/
 
             Positioned(
-              top: 150,
-              left: 8,
-              child: ImageOverlapView()
+              top: 180,
+              left: 16,
+              child:
+              ImageOverlapView()
 
             ), //Positioned
 
@@ -112,7 +113,7 @@ class MovieDetailsSliverAppBarView extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.only(
                     top: MARGIN_XXLARGE+MARGIN_MEDIUM,
-                    right: MARGIN_MEDIUM_2
+                    right: MARGIN_MEDIUM_LARGE
                 ),
                 child: ShareButtonView(),
               ),
@@ -126,11 +127,11 @@ class MovieDetailsSliverAppBarView extends StatelessWidget {
               alignment: Alignment.bottomRight,
               child: Container(
                   padding: EdgeInsets.only(
-                      left: MARGIN_MEDIUM_2
+                      left: MARGIN_MEDIUM_LARGE
                   ),
                 // color: PRIMARY_COLOR,
-                height: 120,
-                width: MediaQuery.of(context).size.width/1.7,
+                height: 150,
+                width: MediaQuery.of(context).size.width/1.5,
                 child: MoviesTypesView(genreList: genreList,),
               )
               ),
@@ -142,22 +143,15 @@ class MovieDetailsSliverAppBarView extends StatelessWidget {
 }
 
 class ImageOverlapView extends StatelessWidget {
-  // final List<String> genreList = [
-  //   "Action",
-  //   "Adventure",
-  //   "Drama",
-  //   "Animation"
-  // ];
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 180,
       child: Row(
         children: [
           Image.network("https://rukminim1.flixcart.com/image/416/416/k0bbb0w0/poster/u/h/a/medium-cute-minions-cartoon-wall-poster-for-children-high-original-imafk4xygze3chhh.jpeg?q=70",
             height: BEST_ACTOR_HEIGHT,
          ),
-          // SizedBox(width: MARGIN_MEDIUM_2,),
-          // MoviesTypesView(genreList: genreList,)
         ],
       ),
     );
@@ -176,7 +170,6 @@ class MoviesTypesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.fromLTRB(0, MARGIN_MEDIUM, 0, 0),
       child:
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,7 +188,6 @@ class MoviesTypesView extends StatelessWidget {
               )
             ],
           ),
-          SizedBox(height: MARGIN_MEDIUM,),
 
           TypeText("2D,3D,3D IMAX,3D DBOX",Colors.white,TEXT_REGULAR_1X,isFontWeight: true,),
           MoviesTypesList(genreList: genreList),
@@ -296,7 +288,7 @@ class MoviesReleaseDateView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(MARGIN_MEDIUM),
+      margin: EdgeInsets.all(MARGIN_MEDIUM_2),
       child: Flexible(
           child:
         Row(
@@ -324,15 +316,15 @@ class MoviesDurationView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(MARGIN_MEDIUM),
+      padding: EdgeInsets.fromLTRB(MARGIN_MEDIUM,MARGIN_MEDIUM_2,MARGIN_MEDIUM,MARGIN_MEDIUM_2),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(10)),
           gradient: LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
               colors: [
-                Color.fromRGBO(22, 22, 22, 1.0),
-                Color.fromRGBO(21, 21, 21, 1.0)
+                Color.fromRGBO(34, 34, 34, 1.0),
+                Color.fromRGBO(17, 17, 17, 1.0)
           ]
           )
       ),
@@ -357,7 +349,7 @@ class StoryLineView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(MARGIN_MEDIUM),
+      margin: EdgeInsets.all(MARGIN_MEDIUM_2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -10,7 +10,7 @@ class MovieDetailMessageView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(MARGIN_MEDIUM),
-      margin: EdgeInsets.all(MARGIN_MEDIUM),
+      margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(8.0)),
         color: MOVIES_MESSAGE_BACKGROUND

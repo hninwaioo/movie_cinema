@@ -3,6 +3,8 @@ import 'package:movie_cinema/resources/colors.dart';
 import 'package:movie_cinema/resources/dimens.dart';
 import 'package:movie_cinema/widgets/type_text.dart';
 
+import 'check_out_view_page.dart';
+
 class SnackFoodTypesViewPage extends StatelessWidget {
 
   List<String> genreList = [
@@ -19,8 +21,8 @@ class SnackFoodTypesViewPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: PRIMARY_COLOR,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: PRIMARY_COLOR,
-
         title: BackBtnAppBarView(),
         actions: [
           SkipAppBarViewPage()
@@ -63,7 +65,14 @@ class BackBtnAppBarView extends StatelessWidget {
     return Container(
       child: Row(
         children: [
-          Icon(Icons.arrow_back_ios_new_outlined,color: Colors.white,),
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Icon(
+              Icons.arrow_back_ios_new_outlined,
+              color: Colors.white,
+            ),
+          ),
+          // Icon(Icons.arrow_back_ios_new_outlined,color: Colors.white,),
           SizedBox(width: MARGIN_MEDIUM_LARGE,),
           TypeText("Grab a bit!", Colors.white, TEXT_REGULAR_1X,isFontWeight: true,)
         ],
@@ -171,7 +180,6 @@ class SnackItemsView extends StatelessWidget {
 }
 
 class FoodPriceTotalView extends StatelessWidget {
-  const FoodPriceTotalView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -270,22 +278,30 @@ class _FoodChoosedItemsViewState extends State<FoodChoosedItemsView> {
       child: Column(
 
         children: [
-          Visibility(
-            visible: _isVisible,
-            child: Column(
-              children: [
-                FoodSelectedItemsView(),
-                FoodSelectedItemsView()
-              ],
-            ),
-          ),
+          // Visibility(
+          //   visible: _isVisible,
+          //   child: Column(
+          //     children: [
+          //       FoodSelectedItemsView(),
+          //       FoodSelectedItemsView()
+          //     ],
+          //   ),
+          // ),
           SizedBox(height: MARGIN_MEDIUM,),
           GestureDetector(
-            onTap: showToast,
+            onTap: (){
+              _navigateToCheckOutScreen(context);
+            },
             child: FoodPriceTotalView()
           )
         ],
       ),
+    );
+  }
+  Future<dynamic> _navigateToCheckOutScreen(BuildContext context) {
+    return Navigator.push(context, MaterialPageRoute(
+        builder: (context) => CheckOutDialogViewPage()
+    )
     );
   }
 }

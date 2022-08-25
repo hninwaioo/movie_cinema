@@ -29,7 +29,7 @@ class BookingAvailableDateView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM),
-      padding: EdgeInsets.all(MARGIN_MEDIUM),
+      padding: EdgeInsets.all(MARGIN_MEDIUM_2),
       alignment: Alignment.center,
       height: 90,
       decoration: BoxDecoration(

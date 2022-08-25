@@ -4,6 +4,8 @@ import 'package:movie_cinema/resources/dimens.dart';
 import 'package:movie_cinema/resources/strings.dart';
 import 'package:movie_cinema/widgets/type_text.dart';
 
+import '../pages/snack_food_types_view_page.dart';
+
 
 class CinemaNameDetailView extends StatefulWidget {
 
@@ -24,51 +26,61 @@ class _CinemaNameDetailViewState extends State<CinemaNameDetailView> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM),
-      child:
-          Column(
-            children: [
-              Row(
-                children: [
-                  TypeText(widget.cinema_name, Colors.white, TEXT_REGULAR_1X,isFontWeight: true,),
-                  Spacer(),
+      margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
+      child: GestureDetector(
+        onTap: (){
+          _navigateToSnackFoodScreen(context);
+        },
+        child: Column(
+          children: [
+            Row(
+              children: [
+                TypeText(widget.cinema_name, Colors.white, TEXT_REGULAR_1X,isFontWeight: true,),
+                Spacer(),
 
-                  GestureDetector(
-                    onTap: showToast,
-                    child: Text(
-                      "See Details",
-                      style: TextStyle(
-                          color: SIGN_PHONE_NUMBER_BUTTON_COLOR,
-                          fontSize: TEXT_REGULAR_1X,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline
-                      ),
+                GestureDetector(
+                  onTap: showToast,
+                  child: Text(
+                    "See Details",
+                    style: TextStyle(
+                        color: SIGN_PHONE_NUMBER_BUTTON_COLOR,
+                        fontSize: TEXT_REGULAR_1X,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline
                     ),
                   ),
+                ),
+              ],
+            ),
+            SizedBox(height: MARGIN_MEDIUM_LARGE,),
+
+            Container(
+              child: Row(
+                children: [
+                  CinemaPlaceTypesView("assets/images/parking_icon.png","Parking"),
+                  SizedBox(width: MARGIN_MEDIUM_2,),
+                  CinemaPlaceTypesView("assets/images/online_food_icon.png","Online Foods"),
+                  SizedBox(width: MARGIN_MEDIUM_2,),
+                  CinemaPlaceTypesView("assets/images/wheel_chair_icon.png","Wheel Chair")
                 ],
               ),
-              SizedBox(height: MARGIN_MEDIUM_LARGE,),
+            ),
+            // SizedBox(height: MARGIN_MEDIUM_LARGE,),
+            Visibility(
+                visible: _isVisible,
+                child: CinemaSeatAvailableView()
 
-              Container(
-                child: Row(
-                  children: [
-                    CinemaPlaceTypesView("assets/images/parking_icon.png","Parking"),
-                    SizedBox(width: MARGIN_MEDIUM_2,),
-                    CinemaPlaceTypesView("assets/images/online_food_icon.png","Online Foods"),
-                    SizedBox(width: MARGIN_MEDIUM_2,),
-                    CinemaPlaceTypesView("assets/images/wheel_chair_icon.png","Wheel Chair")
-                  ],
-                ),
-              ),
-              // SizedBox(height: MARGIN_MEDIUM_LARGE,),
-              Visibility(
-                  visible: _isVisible,
-                  child: CinemaSeatAvailableView()
+            )
+          ],
+        ),
+      )
+    );
+  }
 
-              )
-            ],
-          ),
-
+  Future<dynamic> _navigateToSnackFoodScreen(BuildContext context) {
+    return Navigator.push(context, MaterialPageRoute(
+        builder: (context) => SnackFoodTypesViewPage()
+    )
     );
   }
 }

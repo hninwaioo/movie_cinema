@@ -8,14 +8,13 @@ class CastSectionView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
       color: PRIMARY_COLOR,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-              padding: const EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-              child: TypeText("Cast",Colors.white,TEXT_REGULAR_1X,isFontWeight: true,)
-          ),
+          TypeText("Cast",Colors.white,TEXT_REGULAR_1X,isFontWeight: true,),
+
           SizedBox(height: MARGIN_MEDIUM_2,),
           Container(
             height: MOVIE_LIST_ITEM_WIDTH,

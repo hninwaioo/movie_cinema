@@ -58,7 +58,8 @@ class MoviesTypeView extends StatelessWidget {
               SizedBox(width: MARGIN_MEDIUM,),
               TypeText("2D,3D,IMAX", Colors.white, TEXT_REGULAR_1X,isFontWeight: true),
             ],
-          )
+          ),
+          SizedBox(height: MARGIN_MEDIUM_2,),
         ],
       ),
     );

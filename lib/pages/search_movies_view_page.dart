@@ -3,7 +3,6 @@ import 'package:movie_cinema/resources/colors.dart';
 import 'package:movie_cinema/widgets/type_text.dart';
 import '../resources/dimens.dart';
 import '../viewsitems/search_movies_items_view.dart';
-import 'movies_detail_page.dart';
 
 class SearchMoviesViewPage extends StatelessWidget {
   const SearchMoviesViewPage({Key? key}) : super(key: key);
@@ -32,20 +31,13 @@ class SearchMoviesViewPage extends StatelessWidget {
             ),
             SizedBox(height: MARGIN_MEDIUM_LARGE,),
 
-            SearchMoviesItemsView(
-                    () =>
-                    _navigateToMoviesDetailScreen(context)
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_LARGE),
+                child: SearchMoviesItemsView()
             )
           ],
         ),
       ),
-    );
-  }
-
-  Future<dynamic> _navigateToMoviesDetailScreen(BuildContext context) {
-    return Navigator.push(context, MaterialPageRoute(
-        builder: (context) => MoviesDetailPage()
-    )
     );
   }
 }
@@ -64,11 +56,16 @@ class SearchMoviesView extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                alignment: Alignment.topLeft,
-                child: Icon(
-                  Icons.arrow_back_ios_new_outlined,
-                  color: Colors.white,
+              GestureDetector(
+                onTap: (){
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.topLeft,
+                  child: Icon(
+                    Icons.arrow_back_ios_new_outlined,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               Container(

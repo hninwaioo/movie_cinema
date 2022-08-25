@@ -6,9 +6,6 @@ import 'movies_list_view.dart';
 
 class NowShowingMoviesView extends StatelessWidget {
 
-  // final Function onTapMovie;
-  // NowShowingMoviesView(this.onTapMovie);
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -20,20 +17,11 @@ class NowShowingMoviesView extends StatelessWidget {
       mainAxisSpacing: MARGIN_MEDIUM,
       children: List.generate(4,(index){
         return Container(
-          child: SearchMoviesItemsView(
-                  ()=> _navigateToMoviesDetailScreen(context)
-
-          ),
+          child: SearchMoviesItemsView(),
         );
       }),
     ),
     );
   }
 
-  Future<dynamic> _navigateToMoviesDetailScreen(BuildContext context) {
-    return Navigator.push(context, MaterialPageRoute(
-        builder: (context) => MoviesDetailPage()
-    )
-    );
-  }
 }

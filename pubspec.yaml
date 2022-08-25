@@ -102,6 +102,17 @@ flutter:
      - assets/images/plus_icon.png
      - assets/images/minus_icon.png
      - assets/images/continue_icon.png
+     - assets/images/payment_upi_icon.png
+     - assets/images/payment_gift_voucher.png
+     - assets/images/payment_quick_pay.png
+     - assets/images/payment_credit_card.png
+     - assets/images/payment_redeem_point.png
+     - assets/images/payment_mobile_wallet.png
+     - assets/images/payment_net_banking.png
+     - assets/images/payment_qr_code.png
+     - assets/images/success_booking.png
+     - assets/images/ticket_white.png
+     - assets/images/unlock_offer.png
 
 
   #   - images/a_dot_burr.jpeg

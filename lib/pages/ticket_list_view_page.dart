@@ -28,11 +28,11 @@ class TicketListViewPage extends StatelessWidget {
         padding: EdgeInsets.only(left: MARGIN_SMALL),
         children: [
           MoviesAboutViewList(),
-          SizedBox(width: MARGIN_MEDIUM,),
+          SizedBox(height: MARGIN_MEDIUM_2,),
           MoviesAboutViewList(),
-          SizedBox(width: MARGIN_MEDIUM,),
+          SizedBox(height: MARGIN_MEDIUM_2,),
           MoviesAboutViewList(),
-          SizedBox(width: MARGIN_MEDIUM,),
+          SizedBox(height: MARGIN_MEDIUM_2,),
 
         ],
       ),
@@ -52,17 +52,17 @@ class MoviesAboutViewList extends StatelessWidget {
       child: Container(
 
         height: MediaQuery.of(context).size.height/1.8,
-        padding: EdgeInsets.all(MARGIN_MEDIUM),
-        margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM),
+        padding: EdgeInsets.all(MARGIN_MEDIUM_2),
+        margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(10)),
             gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.transparent,
-                  Colors.white10,
-                  Colors.transparent
+                  Color.fromRGBO(68, 68, 68, 1.0),
+                  Color.fromRGBO(34, 34, 34, 1.0),
+                  Color.fromRGBO(68, 68, 68, 1.0),
                 ]
             )
         ),
@@ -70,15 +70,14 @@ class MoviesAboutViewList extends StatelessWidget {
         child: Column(
           children: [
             MovieAboutImageView(),
-            SizedBox(height: MARGIN_MEDIUM,),
+            SizedBox(height: MARGIN_MEDIUM_2,),
             DottedLine(dashLength: 10, dashGapLength: 10,dashColor: PRIMARY_HINT_COLOR),
-            SizedBox(height: MARGIN_MEDIUM,),
+            SizedBox(height: MARGIN_MEDIUM_LARGE,),
             MoviesDateTimeLocation()
           ],
         ),
       )
     );
-
   }
 
 
@@ -104,9 +103,9 @@ class MovieAboutImageView extends StatelessWidget {
             child:
               Image.network(
                 "https://cps-static.rovicorp.com/2/Open/NBC_Universal/Program/44168205/_derived_jpg_q90_310x470_m0/MinionsTheRiseOfGru_2x3_6_1658296310419_7.jpg",
-                height: 180,
+                height: 170,
                 fit:BoxFit.cover,
-                width: 120,
+                width: 100,
 
               )
           ),
@@ -129,7 +128,7 @@ class MoviesAboutViewsPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: MARGIN_MEDIUM,),
+          SizedBox(height: MARGIN_XLARGE,),
           Row(
             children: [
               TypeText("Minions", Colors.white, TEXT_REGULAR_1X,isFontWeight: true,),
@@ -137,11 +136,11 @@ class MoviesAboutViewsPage extends StatelessWidget {
 
             ],
           ),
-          SizedBox(height: MARGIN_MEDIUM_LARGE,),
+          SizedBox(height: MARGIN_MEDIUM,),
           TypeText("JCGV:Junction City", SIGN_PHONE_NUMBER_BUTTON_COLOR, TEXT_REGULAR_1X,isFontWeight: true,),
           SizedBox(height: MARGIN_MEDIUM_LARGE,),
           M_TicketView(),
-          SizedBox(height: MARGIN_MEDIUM_LARGE,),
+          SizedBox(height: MARGIN_MEDIUM,),
           Row(
             children: [
               TypeText("Gold-G8,G7", Colors.white, TEXT_REGULAR_1X,isFontWeight: true,),

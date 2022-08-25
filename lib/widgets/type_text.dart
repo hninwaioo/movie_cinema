@@ -34,3 +34,35 @@ class TypeText extends StatelessWidget {
     );
   }
 }
+
+class NormalText extends StatelessWidget {
+  final String text;
+  final Color text_color;
+  final double fontSize;
+  final bool isFontWeight;
+  NormalText(
+      this.text,
+      this.text_color,
+      this.fontSize,
+      {this.isFontWeight=false}
+      );
+
+  // const TitleText({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      textAlign: TextAlign.start,
+      style: TextStyle(
+          color: text_color,
+          fontSize: fontSize,
+          fontWeight: (isFontWeight)
+              ?
+          FontWeight.bold
+              :
+          null
+      ),
+    );
+  }
+}
+

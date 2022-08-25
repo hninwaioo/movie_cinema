@@ -24,3 +24,4 @@ const PROFILE_LOGOUT = "Logout";
 
 const SET_NOTIFICATION = "Set Notification";
 const TICKET_CANCELION_POLICY = "Ticket Cancelion Policy";
+const UNLOCK_PROMOCODE = "Unlock Offer and Apply Promocode";

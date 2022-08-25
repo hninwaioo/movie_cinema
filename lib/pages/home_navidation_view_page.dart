@@ -46,16 +46,7 @@ class _HomeNavigationViewPageState extends State<HomeNavigationViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // automaticallyImplyLeading: false,
-      // backgroundColor: PRIMARY_COLOR,
-      // appBar: AppBar(
-      //   automaticallyImplyLeading: false,
-      //   backgroundColor: PRIMARY_COLOR,
-      //   title: LocationAppBarSectionView(),
-      //   actions: [
-      //     SearchNotiScanSectionView()
-      //   ],
-      // ),
+
       body: _currentPage,
       bottomNavigationBar:
              BottomNavigationBar(

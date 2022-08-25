@@ -7,10 +7,12 @@ import 'package:movie_cinema/pages/get_otp_view_page.dart';
 import 'package:movie_cinema/pages/home_navidation_view_page.dart';
 import 'package:movie_cinema/pages/login_view_page.dart';
 import 'package:movie_cinema/pages/movies_detail_page.dart';
+import 'package:movie_cinema/pages/payment_view_page.dart';
 import 'package:movie_cinema/pages/profile_view_page.dart';
 import 'package:movie_cinema/pages/search_movies_view_page.dart';
 import 'package:movie_cinema/pages/snack_food_types_view_page.dart';
 import 'package:movie_cinema/pages/start_view_page.dart';
+import 'package:movie_cinema/pages/ticket_confirmation_view_page.dart';
 import 'package:movie_cinema/pages/ticket_detail_view_page.dart';
 import 'package:movie_cinema/pages/ticket_list_view_page.dart';
 import 'package:movie_cinema/viewsitems/search_movies_items_view.dart';
@@ -30,7 +32,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: FunnyContainer(),
+      home: HomeNavigationViewPage(),
     );
   }
 }

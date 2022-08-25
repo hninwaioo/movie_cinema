@@ -7,6 +7,7 @@ import 'package:movie_cinema/resources/strings.dart';
 
 import '../resources/dimens.dart';
 import '../widgets/type_text.dart';
+import 'check_out_view_page.dart';
 
 class TicketDetailViewPage extends StatelessWidget {
 
@@ -239,7 +240,25 @@ class ConvenienceFeeView extends StatelessWidget {
           SizedBox(height: MARGIN_MEDIUM,),
 
           ElevatedButton.icon(// <-- ElevatedButton
-              onPressed: () {},
+              onPressed: () {
+                // showDialog(context: context, builder: builder)
+
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Dialog(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+
+                            borderRadius:
+                            BorderRadius.circular(30.0)), //this right here
+                        child: Container(
+                          height: 450,
+                          child: TermsAndPolicyViewPage()
+                        ),
+                      );
+                    });
+              },
               icon: Icon(
                 Icons.info_outline,
                 color: Colors.white,

@@ -55,6 +55,8 @@ class BookingMoviesViewPage extends StatelessWidget {
             ),
             SizedBox(height: MARGIN_MEDIUM_LARGE,),
             CinemaNameDetailView("Mingalar Cinema Gold Class"),
+            SizedBox(height: MARGIN_MEDIUM_LARGE,),
+
           ],
         ),
       ),
@@ -113,7 +115,7 @@ class AvailableMoviesItems extends StatelessWidget {
     return Container(
       child: Row(
         children: [
-          Image.asset("assets/images/ellipse.png",color: _color,width: 8,height: 8,
+          Image.asset("assets/images/ellipse.png",color: _color,width: 6,height: 6,
           fit: BoxFit.cover,),
           SizedBox(width: MARGIN_SMALL,),
           Text(

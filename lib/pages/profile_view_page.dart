@@ -117,6 +117,7 @@ class ProfileFeaturesView extends StatelessWidget {
               "assets/images/logout_icon.png",
               PROFILE_LOGOUT
           ),
+          SizedBox(height: MARGIN_MEDIUM_LARGE,)
         ],
       ),
     );

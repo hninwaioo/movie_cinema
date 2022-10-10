@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:movie_cinema/network/responses/get_set_city_response.dart';
 import 'package:movie_cinema/resources/colors.dart';
 import 'package:movie_cinema/widgets/type_text.dart';
 
+import '../data/function/show_load_dialog.dart';
+import '../data/model/movie_model.dart';
+import '../data/model/movie_model_impl.dart';
+import '../data/vos/cities_vo.dart';
 import '../resources/dimens.dart';
 import 'home_navidation_view_page.dart';
 
@@ -12,7 +17,27 @@ class ChooseLocationViewPage extends StatefulWidget {
 }
 
 class _ChooseLocationViewPageState extends State<ChooseLocationViewPage> {
+
+  MovieModel mMovieModel = MovieModelImpl();
+  List<CitiesVO>? mCitiesList;
+
   get prefixIcon => null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// Cities List
+    mMovieModel.getCities().then((citiesList) {
+      setState(() {
+        mCitiesList = citiesList;
+        print("mCitiesList==>${mCitiesList}");
+      });
+    }).catchError((error) {
+      debugPrint("ERROR=>>${error.toString()}");
+    });
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,12 +55,21 @@ class _ChooseLocationViewPageState extends State<ChooseLocationViewPage> {
             ),
 
             SearchLocationSectionView(prefixIcon: prefixIcon),
-            Container(
-              alignment: Alignment.centerRight,
-              child: Image.asset("assets/images/cities_icon.png"),
+            GestureDetector(
+              onTap: (){
+            print("object=>${mCitiesList}");
 
+            },
+              child: Container(
+                alignment: Alignment.centerRight,
+                child: Image.asset("assets/images/cities_icon.png"),
+
+              ),
             ),
-            CitiesListSectionView()
+
+            CitiesListSectionView(
+                mCitiesList: mCitiesList,
+            )
           ],
         ),
       ),
@@ -110,15 +144,51 @@ class SearchLocationSectionView extends StatelessWidget {
     );
   }
 
-  Future<dynamic> _navigateToHomeNavigationScreen(BuildContext context) {
-    return Navigator.push(context, MaterialPageRoute(
-        builder: (context) => HomeNavigationViewPage()
-    )
-    );
-  }
 }
 
-class CitiesListSectionView extends StatelessWidget {
+Future<dynamic> _navigateToHomeNavigationScreen(BuildContext context) {
+  return Navigator.push(context, MaterialPageRoute(
+      builder: (context) => HomeNavigationViewPage()
+  )
+  );
+}
+
+class CitiesListSectionView extends StatefulWidget {
+  List<CitiesVO>? mCitiesList;
+  CitiesListSectionView({required this.mCitiesList});
+
+  @override
+  State<CitiesListSectionView> createState() => _CitiesListSectionViewState();
+}
+
+class _CitiesListSectionViewState extends State<CitiesListSectionView> {
+
+  MovieModel mMovieModel = MovieModelImpl();
+  String token = "Bearer 14677|TBdKG0ByjbrAmkHX3317oN1aMljYh1nZK1Ug5M86";
+  SetCityResponse? setCityResponse;
+
+  void _setCity(int cityId){
+
+    mMovieModel.setCity(token, cityId)?.then((city) {
+      setState((){
+        setCityResponse = city;
+        if(city.code == 200){
+          Navigator.pop(context);
+          _navigateToHomeNavigationScreen(context);
+
+        }else{
+          Navigator.pop(context);
+        }
+      });
+
+    }).catchError((error){
+      Navigator.pop(context);
+      debugPrint("ERROR=>>${error.toString()}");
+    });
+
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -138,67 +208,118 @@ class CitiesListSectionView extends StatelessWidget {
          ),
        ),
 
+       // CitiyItemView(),
        Container(
-         padding: EdgeInsets.all(MARGIN_MEDIUM_2),
-         child: TypeText(
-           "Yangon",
-           Colors.white,
-           TEXT_REGULAR,
-           isFontWeight: true,
-         ),
+           height: MOVIE_LIST_ITEM_WIDTH,
+           child: (widget.mCitiesList != null)
+               ?
+           ListView.builder(
+               scrollDirection: Axis.vertical,
+               padding: EdgeInsets.only(left: MARGIN_MEDIUM_2),
+               itemCount: widget.mCitiesList?.length,
+               itemBuilder:(BuildContext context, int index){
+                 return Row(
+                   children: [
+                     CitiyItemView(
+                         mCitiy: widget.mCitiesList?[index],
+                         onChooseCity: (cityId){
+                           print("CityId=>${cityId}");
+                           showLoginDialog(context);
+                           _setCity(widget.mCitiesList?[index].id??0);
+                         }),
+
+                     Divider(
+                       color: PRIMARY_HINT_COLOR,
+                     ),
+                   ],
+                 );
+               }
+           )
+               :
+           Center(
+             child: CircularProgressIndicator(),
+           )
        ),
-       Divider(
-         color: PRIMARY_HINT_COLOR,
-       ),
-       Container(
-         padding: EdgeInsets.all(MARGIN_MEDIUM_2),
-         child: TypeText(
-           "Mandalay",
-           Colors.white,
-           TEXT_REGULAR,
-           isFontWeight: true,
-         ),
-       ),
-       Divider(
-         color: PRIMARY_HINT_COLOR,
-       ),
-       Container(
-         padding: EdgeInsets.all(MARGIN_MEDIUM_2),
-         child: TypeText(
-           "Naypyidaw",
-           Colors.white,
-           TEXT_REGULAR,
-           isFontWeight: true,
-         ),
-       ),
-       Divider(
-         color: PRIMARY_HINT_COLOR,
-       ),
-       Container(
-         padding: EdgeInsets.all(MARGIN_MEDIUM_2),
-         child: TypeText(
-           "Bago",
-           Colors.white,
-           TEXT_REGULAR,
-           isFontWeight: true,
-         ),
-       ),
-       Divider(
-         color: PRIMARY_HINT_COLOR,
-       ),
-       Container(
-         padding: EdgeInsets.all(MARGIN_MEDIUM_2),
-         child: TypeText(
-           "Mawlamyine",
-           Colors.white,
-           TEXT_REGULAR,
-           isFontWeight: true,
-         ),
-       ),
-       Divider(
-         color: PRIMARY_HINT_COLOR,
-       ),
+
+       // Divider(
+       //   color: PRIMARY_HINT_COLOR,
+       // ),
+       // Container(
+       //   padding: EdgeInsets.all(MARGIN_MEDIUM_2),
+       //   child: TypeText(
+       //     "Mandalay",
+       //     Colors.white,
+       //     TEXT_REGULAR,
+       //     isFontWeight: true,
+       //   ),
+       // ),
+       // Divider(
+       //   color: PRIMARY_HINT_COLOR,
+       // ),
+       // Container(
+       //   padding: EdgeInsets.all(MARGIN_MEDIUM_2),
+       //   child: TypeText(
+       //     "Naypyidaw",
+       //     Colors.white,
+       //     TEXT_REGULAR,
+       //     isFontWeight: true,
+       //   ),
+       // ),
+       // Divider(
+       //   color: PRIMARY_HINT_COLOR,
+       // ),
+       // Container(
+       //   padding: EdgeInsets.all(MARGIN_MEDIUM_2),
+       //   child: TypeText(
+       //     "Bago",
+       //     Colors.white,
+       //     TEXT_REGULAR,
+       //     isFontWeight: true,
+       //   ),
+       // ),
+       // Divider(
+       //   color: PRIMARY_HINT_COLOR,
+       // ),
+       // Container(
+       //   padding: EdgeInsets.all(MARGIN_MEDIUM_2),
+       //   child: TypeText(
+       //     "Mawlamyine",
+       //     Colors.white,
+       //     TEXT_REGULAR,
+       //     isFontWeight: true,
+       //   ),
+       // ),
+       // Divider(
+       //   color: PRIMARY_HINT_COLOR,
+       // ),
      ],
+    );
+  }
+}
+
+class CitiyItemView extends StatelessWidget {
+  CitiesVO? mCitiy;
+  final Function (int) onChooseCity;
+  CitiyItemView({required this.mCitiy, required this.onChooseCity});
+
+  @override
+  Widget build(BuildContext context) {
+    return
+    GestureDetector(
+      onTap: (){
+        onChooseCity(mCitiy?.id??0);
+        print("object");
+        },
+
+      child: Container(
+        padding: EdgeInsets.all(MARGIN_MEDIUM_2),
+        child: TypeText(
+          mCitiy?.name??"",
+          Colors.white,
+          TEXT_REGULAR,
+          isFontWeight: true,
+        ),
+      ),
     );
   }
 }

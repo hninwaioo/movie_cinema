@@ -1,20 +1,98 @@
 import 'package:flutter/material.dart';
+import 'package:movie_cinema/data/vos/snack/snack_categories_vo.dart';
+import 'package:movie_cinema/data/vos/snack/snack_vo.dart';
 import 'package:movie_cinema/resources/colors.dart';
 import 'package:movie_cinema/resources/dimens.dart';
 import 'package:movie_cinema/widgets/type_text.dart';
 
+import '../data/model/movie_model.dart';
+import '../data/model/movie_model_impl.dart';
+import '../data/vos/movie_now_and_coming_soon/movie_vo.dart';
+import '../data/vos/snack/add_snack_list_vo.dart';
 import 'check_out_view_page.dart';
 
-class SnackFoodTypesViewPage extends StatelessWidget {
+class SnackFoodTypesViewPage extends StatefulWidget {
+  MovieVO? mMovieVO;
+  int? cinemaDayTimeSlots;
+  String? startTime;
+  String? completeDate;
 
-  List<String> genreList = [
-    "All",
-    "Combo",
-    "Snack",
-    "Pop Corn",
-    "Beverage",
+  SnackFoodTypesViewPage({
+    required this.mMovieVO,
+    required this.cinemaDayTimeSlots,
+    required this.startTime,
+    required this.completeDate
+  });
 
-  ];
+  @override
+  State<SnackFoodTypesViewPage> createState() => _SnackFoodTypesViewPageState();
+}
+
+class _SnackFoodTypesViewPageState extends State<SnackFoodTypesViewPage> {
+  MovieModel mMovieModel = MovieModelImpl();
+  List<SnackCategoriesVO>? snackCategoriesList;
+  List<SnackVO>? snackList;
+  String token = "Bearer 14677|TBdKG0ByjbrAmkHX3317oN1aMljYh1nZK1Ug5M86";
+
+  List<String?> categoriesList = ["All"];
+
+  List<AddSnackListVO> addSnackListVO = [];
+  // List<MyItem> myItemsList = new List();
+
+  int totalFoodPrice = 0;
+
+  @override
+  void initState(){
+    super.initState();
+
+    mMovieModel.getSnackCategories(token)
+    .then((categories){
+      setState((){
+        this.snackCategoriesList = categories;
+        print("object>${snackCategoriesList?.map((e) => e.title).toList()}");
+        categoriesList.addAll(snackCategoriesList?.map((e) => e.title).toList() as List<String?>);
+        print("Object=>${categoriesList}");
+      });
+    }).catchError((error) {
+      debugPrint("ERROR=>${error.toString()}");
+    });
+
+    mMovieModel.getAllSnack(token)
+    .then((allSnack){
+      setState((){
+        this.snackList = allSnack;
+      });
+    }).catchError((error){
+      debugPrint("ERROR=>${error.toString()}");
+    });
+
+  }
+
+  void _getSnackByGenreAndRefresh(String token,int genreId){
+
+    if(genreId == 0){
+
+      mMovieModel.getAllSnack(token)
+          .then((allSnack){
+        setState((){
+          this.snackList = allSnack;
+        });
+      }).catchError((error){
+        debugPrint("ERROR=>${error.toString()}");
+      });
+
+    }else {
+
+      mMovieModel.getCategoriesSnack(token,genreId).then((snackByGenre){
+        setState((){
+          this.snackList = snackByGenre;
+        });
+      }).catchError((error){
+        debugPrint(error.toString());
+      });
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,22 +109,81 @@ class SnackFoodTypesViewPage extends StatelessWidget {
 
       body: Column(
           children:[
-            FoodTypeGenreSectionView(genreList),
+            FoodTypeGenreSectionView(
+                genreList: categoriesList,
+                onTapGenre: (genreId) {
+                  print("GenreId===>${genreId}");
+                  _getSnackByGenreAndRefresh(token,genreId);
+                }
+            ),
 
             Expanded(
-              child: ListView(
-                children: [
-                  FoodItemsView()
-                ],
-              ),
+                child: (snackList != null)
+                    ?
+                ListView(
+                  children: [
+                    FoodItemsView(
+                      snackList,
+                        (addSnackList) {
+
+                        setState((){
+                          print("objectName==${addSnackList.snackName}");
+
+                          final foodType = addSnackListVO.where((element) =>
+                          element.snackName == addSnackList.snackName);
+
+                          if (foodType.isNotEmpty) {
+                            print('Using where: ${foodType.first}');
+                          }else{
+                            print("object");
+                            addSnackListVO.add(addSnackList);
+
+                            for (var i = 0; i < addSnackListVO.length; i++) {
+                              totalFoodPrice = addSnackListVO[i].totalPrice + totalFoodPrice ;
+                              print("TotalPrice=>${totalFoodPrice}");
+
+                            }
+                            print("TotalPrice==>${totalFoodPrice}");
+
+                          }
+
+                        });
+                          // addSnackListVO.add(addSnackList);
+
+                          // var d = addSnackListVO?.map((e) => e.snackName);
+                          // print("objectName=${addSnackListVO?.singleWhere((it) => it.snackName == addSnackList.snackName)}");
+
+
+                        }
+                    )
+                  ],
+                ): Center(
+                  child: CircularProgressIndicator(),
+                )
             ),
+
+            // Expanded(
+            //   child: ListView(
+            //     children: [
+            //       FoodItemsView(snackList)
+            //     ],
+            //   ),
+            // ),
 
             SizedBox(height: MARGIN_MEDIUM_LARGE,),
 
               Align(
                   alignment: FractionalOffset.bottomCenter,
 
-                    child: FoodChoosedItemsView(),
+                    child: FoodChoosedItemsView(
+                      mMovieVO: widget.mMovieVO,
+                        cinemaDayTimeSlots: widget.cinemaDayTimeSlots,
+                        startTime: widget.startTime,
+                        completeDate: widget.completeDate,
+                        addSnackListVO: addSnackListVO,
+                      totalFoodPrice: totalFoodPrice,
+
+                    ),
 
                   // FoodPriceTotalView(),
                 ),
@@ -99,9 +236,15 @@ class SkipAppBarViewPage extends StatelessWidget {
 }
 
 class FoodTypeGenreSectionView extends StatelessWidget {
-  FoodTypeGenreSectionView(this.genreList);
-  final List<String> genreList;
+  FoodTypeGenreSectionView({
+    required this.genreList,
+    required this.onTapGenre
+  });
+
+  final List<String?> genreList;
   // final Function onTapMovie;
+  final Function (int) onTapGenre;
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -110,9 +253,12 @@ class FoodTypeGenreSectionView extends StatelessWidget {
         isScrollable: true,
         indicatorColor: PLAY_BUTTON_COLOR,
         unselectedLabelColor: HOME_SCREEN_LIST_TITLE_COLOR,
+        onTap: (index){
+          this.onTapGenre(index);
+        },
         tabs: genreList.map(
                 (genre) => Tab(
-              child: Text(genre),
+              child: Text(genre??""),
             )
         ).toList(),
       ),
@@ -121,9 +267,20 @@ class FoodTypeGenreSectionView extends StatelessWidget {
   }
 }
 
-class SnackItemsView extends StatelessWidget {
-  const SnackItemsView({Key? key}) : super(key: key);
+class SnackItemsView extends StatefulWidget {
 
+  SnackVO? snacks;
+
+  final Function(AddSnackListVO) onTapMovie;
+
+  SnackItemsView(this.snacks,this.onTapMovie);
+
+  @override
+  State<SnackItemsView> createState() => _SnackItemsViewState();
+}
+
+class _SnackItemsViewState extends State<SnackItemsView> {
+  List<AddSnackListVO>? addSnackList = [];
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -141,30 +298,46 @@ class SnackItemsView extends StatelessWidget {
               ]
           )
       ),
-      
+
       child: Column(
         children: [
           SizedBox(height: MARGIN_MEDIUM_2,),
 
-          Image.asset("assets/images/potato_chip.png",height: 80,
-          width: 60,),
+          Image.network(widget.snacks?.image??"",height: 80,
+          width: 100,),
 
           Align(
             alignment: Alignment.topLeft,
             child:
-            TypeText("Potato Chips", Colors.white, TEXT_REGULAR,isFontWeight: false,),
+            TypeText(widget.snacks?.name??"", Colors.white, TEXT_REGULAR,isFontWeight: false,),
 
           ),
           SizedBox(height: MARGIN_SMALL,),
           Align(
             alignment: Alignment.topLeft,
             child:
-            TypeText("1500Ks", SIGN_PHONE_NUMBER_BUTTON_COLOR, TEXT_REGULAR_1X),
+            TypeText("${widget.snacks?.price} Ks", SIGN_PHONE_NUMBER_BUTTON_COLOR, TEXT_REGULAR_1X),
 
           ),
           SizedBox(height: MARGIN_SMALL,),
           ElevatedButton(
               onPressed: (){
+
+                AddSnackListVO addSnack = AddSnackListVO(id: widget.snacks?.id??0,quantity: 1,snackName: widget.snacks?.name??"",totalPrice: widget.snacks?.price??0);
+
+                widget.onTapMovie(addSnack);
+                  print("movieItemTap");
+
+                // print("AddSnack=>${widget.snacks?.name}");
+                // addSnackList = [AddSnackListVO(
+                //     snackName: widget.snacks?.name,
+                //     number: 1,
+                //     totalPrice: widget.snacks?.price
+                // ),
+                // ];
+                // // addSnackList?.add(addSnack);
+                //
+                // print("AddSnackList=>${addSnackList}");
 
               },
             style: ElevatedButton.styleFrom(
@@ -181,6 +354,11 @@ class SnackItemsView extends StatelessWidget {
 
 class FoodPriceTotalView extends StatelessWidget {
 
+  int totalFoodPrice;
+  Function onBottomSheet;
+  Function goToCheck;
+  FoodPriceTotalView(this.totalFoodPrice,{required this.onBottomSheet, required this.goToCheck});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -192,31 +370,43 @@ class FoodPriceTotalView extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Row(
-            children: [
-              Image.asset("assets/images/online_food_icon.png",
-              color: Colors.black,),
-              SizedBox(width: MARGIN_SMALL,),
+          GestureDetector(
+            onTap: (){
+              onBottomSheet();
+            },
+            child: Row(
+              children: [
+                Image.asset("assets/images/online_food_icon.png",
+                  color: Colors.black,),
+                SizedBox(width: MARGIN_SMALL,),
 
-              Image.asset("assets/images/down_arrow_icon.png",
-                color: Colors.black,),
-            ],
+                Image.asset("assets/images/down_arrow_icon.png",
+                  color: Colors.black,),
+              ],
+            ),
           ),
+
           Spacer(),
-          Row(
-            children: [
-              TypeText("3000Ks", Colors.black, TEXT_REGULAR_1X,isFontWeight: true,),
-              SizedBox(width: MARGIN_SMALL,),
-              Image.asset("assets/images/right_arrow_icon.png",
+
+          GestureDetector(
+            onTap: (){
+              goToCheck();
+            },
+            child: Row(
+              children: [
+                TypeText("${totalFoodPrice} Ks", Colors.black, TEXT_REGULAR_1X,isFontWeight: true,),
+                SizedBox(width: MARGIN_SMALL,),
+                Image.asset("assets/images/right_arrow_icon.png",
                   color: Colors.black,
-                height: 15,
-                width: 16,
-              ),
-              // Icon(Icons.arrow_forward_ios_rounded,
-              //   color: Colors.black,
-              // size: 15,),
-            ],
-          ),
+                  height: 15,
+                  width: 16,
+                ),
+                // Icon(Icons.arrow_forward_ios_rounded,
+                //   color: Colors.black,
+                // size: 15,),
+              ],
+            ),
+          )
         ],
       ),
     );
@@ -224,6 +414,12 @@ class FoodPriceTotalView extends StatelessWidget {
 }
 
 class FoodItemsView extends StatelessWidget {
+
+  List<SnackVO>? snackList;
+  final Function(AddSnackListVO) onTapMovie;
+  // final Function (int) onTapGenre;
+
+  FoodItemsView(this.snackList,this.onTapMovie);
 
   @override
   Widget build(BuildContext context) {
@@ -240,10 +436,19 @@ class FoodItemsView extends StatelessWidget {
           crossAxisSpacing: 15.0,
           mainAxisSpacing: 15.0,
         ),
-        itemCount: 6,
+        itemCount: snackList?.length,
         itemBuilder: (BuildContext context, int index) {
           return Container(
-            child: SnackItemsView(),
+            child: (snackList!= null)
+              ?
+            SnackItemsView(
+              snackList?[index],
+                  (addSnackList){
+                this.onTapMovie(addSnackList);
+              },
+            )
+                :
+                CircularProgressIndicator()
           );
         },
       ),
@@ -252,7 +457,22 @@ class FoodItemsView extends StatelessWidget {
 }
 
 class FoodChoosedItemsView extends StatefulWidget {
-  const FoodChoosedItemsView({Key? key}) : super(key: key);
+
+  MovieVO? mMovieVO;
+  int? cinemaDayTimeSlots;
+  String? startTime;
+  String? completeDate;
+  int totalFoodPrice;
+
+  List<AddSnackListVO> addSnackListVO;
+
+  FoodChoosedItemsView({
+    required this.mMovieVO,
+    required this.cinemaDayTimeSlots,
+    required this.startTime,
+    required this.completeDate,
+    required this.addSnackListVO,
+    required this.totalFoodPrice});
 
   @override
   State<FoodChoosedItemsView> createState() => _FoodChoosedItemsViewState();
@@ -260,12 +480,7 @@ class FoodChoosedItemsView extends StatefulWidget {
 
 class _FoodChoosedItemsViewState extends State<FoodChoosedItemsView> {
 
-  bool _isVisible = true;
-  void showToast() {
-    setState(() {
-      _isVisible = !_isVisible;
-    });
-  }
+  // List<AddSnackListVO>? addSnackList;
 
   @override
   Widget build(BuildContext context) {
@@ -278,53 +493,173 @@ class _FoodChoosedItemsViewState extends State<FoodChoosedItemsView> {
       child: Column(
 
         children: [
-          // Visibility(
-          //   visible: _isVisible,
-          //   child: Column(
-          //     children: [
-          //       FoodSelectedItemsView(),
-          //       FoodSelectedItemsView()
-          //     ],
-          //   ),
-          // ),
+
           SizedBox(height: MARGIN_MEDIUM,),
           GestureDetector(
             onTap: (){
-              _navigateToCheckOutScreen(context);
+              // _navigateToCheckOutScreen(context);
             },
-            child: FoodPriceTotalView()
+            child: FoodPriceTotalView(
+              widget.totalFoodPrice,
+              onBottomSheet: (){
+                showModalBottomSheet(
+                    context: context,
+                    backgroundColor: PRIMARY_COLOR,
+                    shape:  RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(20),
+                      ),
+                    ),
+                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                    builder: (context) {
+                      return
+                        Container(
+                        // color: SIGN_PHONE_NUMBER_BUTTON_COLOR,
+                        height: 200,
+                        padding: EdgeInsets.all(16.0),
+                        child:
+                        ListView.builder(
+                          padding: EdgeInsets.only(left: MARGIN_SMALL),
+                          scrollDirection: Axis.vertical,
+                          itemCount: widget.addSnackListVO.length,
+                          // itemBuilder:
+                          itemBuilder: (BuildContext context, int index) {
+                            return Container(
+                                child: (widget.addSnackListVO != null)
+                                    ?
+                                FoodSelectedItemsView(
+                                  widget.addSnackListVO[index],
+                                )
+                                    : CircularProgressIndicator()
+                              // SnackItemsView(snackList?[index]),
+                            );
+                          },
+                        ),
+                        // Text("DAta"),
+                      );
+                    });
+              },
+
+              goToCheck: (){
+                _navigateToCheckOutScreen(
+                    context,
+                    widget.mMovieVO,
+                    widget.cinemaDayTimeSlots??0,
+                    widget.startTime??"",
+                    widget.completeDate??"",
+                    widget.addSnackListVO);
+              },
+            )
           )
         ],
       ),
     );
   }
-  Future<dynamic> _navigateToCheckOutScreen(BuildContext context) {
+  Future<dynamic> _navigateToCheckOutScreen(
+      BuildContext context,
+      MovieVO? mMovieVO,
+      int cinemaDayTimeSlots,
+      String startTime,
+      String completeDate,
+      List<AddSnackListVO> addSnackListVO
+      ) {
     return Navigator.push(context, MaterialPageRoute(
-        builder: (context) => CheckOutDialogViewPage()
+        builder: (context) => CheckOutDialogViewPage(
+          mMovieVO: mMovieVO,
+          cinemaDayTimeSlots: cinemaDayTimeSlots,
+          startTime: startTime,
+          completeDate: completeDate,
+          addSnackListVO: addSnackListVO,)
     )
     );
   }
 }
 
-class FoodSelectedItemsView extends StatelessWidget {
-  const FoodSelectedItemsView({Key? key}) : super(key: key);
+class FoodSelectedItemsView extends StatefulWidget {
+
+  AddSnackListVO addSnackListVO;
+  FoodSelectedItemsView(this.addSnackListVO);
+
+  @override
+  State<FoodSelectedItemsView> createState() => _FoodSelectedItemsViewState();
+}
+
+class _FoodSelectedItemsViewState extends State<FoodSelectedItemsView> {
+
+  var itemCount = 1;
+  var item_count_price = 0;
+
+  @override
+  void initState(){
+    super.initState();
+    itemCount = widget.addSnackListVO.quantity;
+    item_count_price = widget.addSnackListVO.totalPrice;
+  }
+
+  void increaseNumberCount(){
+    if(itemCount>=1){
+      setState((){
+        itemCount ++;
+        // = widget.addSnackListVO.number ++;
+        print("IncreaseNumber=>${itemCount}");
+        item_count_price = widget.addSnackListVO.totalPrice * itemCount;
+        print("IncreaseNumberPrice=>${item_count_price}");
+
+      });
+    }
+  }
+
+  void decreaseNumberCount() {
+    // decreaseNumber;
+    setState(() {
+      if (itemCount > 1) {
+        itemCount --;
+        // = widget.addSnackListVO.number --;
+        print("DecreaseNumber=>${itemCount}");
+        item_count_price = widget.addSnackListVO.totalPrice * itemCount;
+        print("DecreaseNumberPrice=>${item_count_price}");
+      } else {
+
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+
         children: [
-          TypeText("Large Cola", Colors.white, TEXT_REGULAR_1X,isFontWeight: true,),
+          TypeText(widget.addSnackListVO.snackName, Colors.white, TEXT_REGULAR_1X,isFontWeight: true,),
+          Spacer(),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Image.asset("assets/images/plus_icon.png"),
-              Spacer(),
-              TypeText("1", SIGN_PHONE_NUMBER_BUTTON_COLOR, TEXT_REGULAR_1X,isFontWeight: true,),
-              Spacer(),
-              Image.asset("assets/images/minus_icon.png")
+
+              GestureDetector(
+                onTap: (){
+                  increaseNumberCount();
+                },
+                child: Image.asset("assets/images/plus_icon.png"),
+              ),
+
+              Center(
+                child: TypeText("${itemCount}", SIGN_PHONE_NUMBER_BUTTON_COLOR, TEXT_REGULAR_1X,isFontWeight: true,),
+              ),
+
+              GestureDetector(
+                onTap: (){
+                  decreaseNumberCount();
+                },
+                child: Image.asset("assets/images/minus_icon.png"),
+              ),
             ],
           ),
-          TypeText("1000Ks", Colors.white, TEXT_REGULAR_1X,isFontWeight: true,),
+          Spacer(),
+          TypeText("${item_count_price} Ks", Colors.white, TEXT_REGULAR_1X,isFontWeight: true,),
         ],
       ),
     );

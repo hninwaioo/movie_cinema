@@ -15,8 +15,8 @@ class MoviesItemImages extends StatelessWidget {
       child:
       Image.network(
         movies_image,
-        height: MOVIE_LIST_ITEM_WIDTH,
-        fit:BoxFit.cover,
+        height: BEST_ACTOR_HEIGHT,
+        fit:BoxFit.fill,
         width: MOVIE_LIST_ITEM_WIDTH,
 
       )
@@ -26,24 +26,40 @@ class MoviesItemImages extends StatelessWidget {
 
 
 class MoviesTypeView extends StatelessWidget {
+  String movieTitle;
+  double movieVoteAverage;
+  MoviesTypeView({required this.movieTitle, required this.movieVoteAverage});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-
       width: MOVIE_LIST_ITEM_WIDTH,
       padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM),
       child: Column(
         children: [
           Row(
             children: [
-              TypeText("Minions", Colors.white, TEXT_REGULAR_1X,isFontWeight: true),
+              // TypeText(movieTitle, Colors.white, TEXT_REGULAR_1X,isFontWeight: true),
+              Container(
+                width: 70,
+                child: Text(
+                  movieTitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  // softWrap: false,
+                  style: TextStyle(
+                      fontSize: TEXT_REGULAR_1X,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold
+                  ),
+                ),
+              ),
               Spacer(),
               Container(
                 child: Row(
                   children: [
                     Image.asset("assets/images/images_im.png",width: 45,height: 35,),
-                    TypeText("9.8", Colors.white, TEXT_REGULAR_1X,isFontWeight: true),
+                    TypeText(movieVoteAverage.toString(), Colors.white, TEXT_REGULAR_1X,isFontWeight: true),
                   ],
                 ),
               )
@@ -113,7 +129,8 @@ class ComingSoonMoviesItemsView extends StatelessWidget {
           print("movieItemTap");
         },
         child:  Container(
-          child:  Stack(
+          child:
+          Stack(
             children: [
               Positioned.fill(
                   child: MoviesItemImages("https://cps-static.rovicorp.com/2/Open/NBC_Universal/Program/44168205/_derived_jpg_q90_310x470_m0/MinionsTheRiseOfGru_2x3_6_1658296310419_7.jpg",

@@ -5,8 +5,24 @@ import 'package:movie_cinema/resources/colors.dart';
 import 'package:movie_cinema/resources/dimens.dart';
 import 'package:movie_cinema/widgets/type_text.dart';
 
+import '../data/vos/movie_now_and_coming_soon/movie_vo.dart';
+import '../network/api_constant.dart';
+
 class TicketConfirmationViewPage extends StatelessWidget {
-  const TicketConfirmationViewPage({Key? key}) : super(key: key);
+
+  MovieVO? mMovieVO;
+  int? cinemaDayTimeSlots;
+  String? startTime;
+  String? completeDate;
+  String? scanImage;
+
+  TicketConfirmationViewPage({
+    required this.mMovieVO,
+    required this.cinemaDayTimeSlots,
+    required this.startTime,
+    required this.completeDate,
+    required this.scanImage
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,12 +37,12 @@ class TicketConfirmationViewPage extends StatelessWidget {
 
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(MARGIN_MEDIUM_2),
+        padding: EdgeInsets.all(MARGIN_MEDIUM),
         child: Column(
           children: [
-            MoviesAboutViewList(),
+            MoviesAboutViewList(movieVO: mMovieVO,completeDate: completeDate,startTime: startTime,),
             SizedBox(height: MARGIN_XLARGE,),
-            ScanQRViewPage(),
+            ScanQRViewPage(scanImage: scanImage,),
             SizedBox(height: MARGIN_XLARGE,),
 
           ],
@@ -38,12 +54,14 @@ class TicketConfirmationViewPage extends StatelessWidget {
 
 class ScanQRViewPage extends StatelessWidget {
 
+  String? scanImage;
+  ScanQRViewPage({required this.scanImage});
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Image.asset("assets/images/payment_qr_code.png"),
+        Image.network("$BASE_AUTH_URL_DIO/$scanImage"),
         SizedBox(height: MARGIN_MEDIUM_2,),
         TypeText("WAG5LP1C", Colors.white, TEXT_REGULAR_3X,isFontWeight: true,),
         SizedBox(height: MARGIN_SMALL,),

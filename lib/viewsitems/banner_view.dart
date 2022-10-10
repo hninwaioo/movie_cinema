@@ -1,10 +1,14 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
+import '../data/vos/banner_vo.dart';
+import '../network/api_constant.dart';
 import '../resources/dimens.dart';
 import '../widgets/gradient_view.dart';
 
 class BannerView extends StatelessWidget {
-  const BannerView({Key? key}) : super(key: key);
+
+  BannerVO? bannerVO;
+  BannerView({required this.bannerVO});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +19,9 @@ class BannerView extends StatelessWidget {
         children: [
           Positioned.fill(
             child:
-            BannerImageView(),
+            BannerImageView(
+              mImageUrl: bannerVO?.url,
+            ),
           ),
           Positioned.fill(
               child: GradientView()
@@ -33,14 +39,17 @@ class BannerView extends StatelessWidget {
 
 class BannerImageView extends StatelessWidget {
 
+  String? mImageUrl;
+  BannerImageView({required this.mImageUrl});
   @override
   Widget build(BuildContext context) {
     return
       ClipRRect(
           borderRadius: BorderRadius.only(topRight: Radius.circular(10),topLeft: Radius.circular(10),bottomLeft: Radius.circular(10),bottomRight: Radius.circular(10)),
           child:  Image.network(
-          "https://d1sag4ddilekf6.azureedge.net/compressed/merchants/9-CY32EB2ETB43WA/hero/1f901883836148bf8a9150277b6e7967_1658064288904088500.jpeg",
-          fit:BoxFit.cover,
+          // "https://d1sag4ddilekf6.azureedge.net/compressed/merchants/9-CY32EB2ETB43WA/hero/1f901883836148bf8a9150277b6e7967_1658064288904088500.jpeg",
+            mImageUrl??"",
+            fit:BoxFit.cover,
       )
      
     );

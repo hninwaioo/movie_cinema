@@ -33,7 +33,7 @@ class SearchMoviesViewPage extends StatelessWidget {
 
             Container(
               margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_LARGE),
-                child: SearchMoviesItemsView()
+                // child: SearchMoviesItemsView()
             )
           ],
         ),

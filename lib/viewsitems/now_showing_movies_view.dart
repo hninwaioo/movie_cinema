@@ -17,7 +17,7 @@ class NowShowingMoviesView extends StatelessWidget {
       mainAxisSpacing: MARGIN_MEDIUM,
       children: List.generate(4,(index){
         return Container(
-          child: SearchMoviesItemsView(),
+          // child: SearchMoviesItemsView(),
         );
       }),
     ),

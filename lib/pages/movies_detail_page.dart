@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:movie_cinema/data/vos/movie_now_and_coming_soon/credit_cast_vo.dart';
+import 'package:movie_cinema/data/vos/movie_now_and_coming_soon/genres_vo.dart';
+import '../data/model/movie_model.dart';
+import '../data/model/movie_model_impl.dart';
+import '../data/vos/movie_now_and_coming_soon/movie_vo.dart';
+import '../network/api_constant.dart';
+import '../network/responses/get_cinema_response.dart';
+import '../network/responses/get_config_response.dart';
 import '../resources/colors.dart';
 import '../resources/dimens.dart';
 import '../widgets/cast_section_view.dart';
@@ -6,52 +14,120 @@ import '../widgets/movies_detail_message_view.dart';
 import '../widgets/play_button_view.dart';
 import '../widgets/type_text.dart';
 import 'booking_movies_view_page.dart';
+import '../viewsitems/curve_booking_button_view.dart';
 
-class MoviesDetailPage extends StatelessWidget {
-  const MoviesDetailPage({Key? key}) : super(key: key);
+class MoviesDetailPage extends StatefulWidget {
+
+  int movieId;
+  String playMovies;
+  ConfigResponse configResponse;
+  CinemaResponse cinemaResponse;
+  MoviesDetailPage(this.movieId, this.playMovies, this.configResponse, this.cinemaResponse);
+
+  @override
+  State<MoviesDetailPage> createState() => _MoviesDetailPageState();
+}
+
+class _MoviesDetailPageState extends State<MoviesDetailPage> {
+
+  MovieModel mMovieModel = MovieModelImpl();
+  MovieVO? mMovieVO;
+  List<CreditCastVO>? mCastList;
+
+  @override
+  void initState(){
+    super.initState();
+    mMovieModel.getMovieDetail(widget.movieId)
+        ?.then((movie) {
+      setState((){
+        this.mMovieVO = movie;
+      });
+    }).catchError((error) {
+      debugPrint("ERROR=>${error.toString()}");
+    });
+
+    if(widget.playMovies == "NOW"){
+      _isVisible = false;
+    }else{
+      _isVisible = true;
+    }
+
+    mMovieModel.getCreditCast(widget.movieId)
+      .then((castList) {
+      setState((){
+        print("mMovieModel=>$mMovieModel");
+
+        this.mCastList = castList;
+      });
+    }).catchError((error) {
+      debugPrint("ERROR=>${error.toString()}");
+    });
+  }
+
+
+  bool _isVisible = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: PRIMARY_COLOR,
       body: Container(
-        color: PRIMARY_COLOR,
-        child: CustomScrollView(
+        child: (mMovieVO !=null)
+          ?
+          CustomScrollView(
           slivers: [
             MovieDetailsSliverAppBarView(
-                    () => Navigator.pop(context)
+                    () => Navigator.pop(context),
+              mMovieVO
             ),
 
             SliverList(
                 delegate: SliverChildListDelegate(
                     [
                       SizedBox(height: MARGIN_MEDIUM_2,),
-                      MoviesReleaseDateView(),
+                      MoviesReleaseDateView(mMovieVO?.releaseDate??""),
                       SizedBox(height: MARGIN_MEDIUM,),
-                      MovieDetailMessageView(),
+
+                      Visibility(
+                          visible: _isVisible,
+                          child: MovieDetailMessageView(),
+
+                      ),
+
                       SizedBox(height: MARGIN_MEDIUM,),
-                      StoryLineView(),
+                      StoryLineView(mMovieVO?.overview??""),
                       SizedBox(height: MARGIN_MEDIUM,),
-                      CastSectionView(),
+
+                      CastSectionView(
+                          castList: mCastList??[]
+                      ),
+
                       GestureDetector(
                         onTap: (){
-                          _navigateToBookingMoviesScreen(context);
+                          _navigateToBookingMoviesScreen(context,widget.configResponse,widget.cinemaResponse,mMovieVO);
                         },
-                        child: Image.asset("assets/images/booking_btn.png"),
+                        child: Container(
+                            width: 100,
+                            // MediaQuery.of(context).size.width/3,
+                            child: CurveBookingButtonView("Booking",Colors.black,SIGN_PHONE_NUMBER_BUTTON_COLOR))
                       ),
                       SizedBox(height: MARGIN_MEDIUM_2,),
                     ]
                 )
             )
           ],
-        ),
-      ),
+        )
+            : Center(
+          child: CircularProgressIndicator(),
+        )
+      )
     );
   }
 
-  Future<dynamic> _navigateToBookingMoviesScreen(BuildContext context) {
+  Future<dynamic> _navigateToBookingMoviesScreen(BuildContext context, ConfigResponse configResponse, CinemaResponse cinemaResponse,  MovieVO? mMovieVO
+  ) {
     return Navigator.push(context, MaterialPageRoute(
-        builder: (context) => BookingMoviesViewPage()
+        builder: (context) => BookingMoviesViewPage(configResponse: configResponse, cinemaResponse: cinemaResponse,mMovieVO: mMovieVO,)
     )
     );
   }
@@ -60,7 +136,8 @@ class MoviesDetailPage extends StatelessWidget {
 class MovieDetailsSliverAppBarView extends StatelessWidget {
 
   final Function onTapBack;
-  MovieDetailsSliverAppBarView(this.onTapBack);
+  MovieVO? mMovie;
+  MovieDetailsSliverAppBarView(this.onTapBack,this.mMovie);
 
   final List<String> genreList = [
     "Action",
@@ -82,9 +159,7 @@ class MovieDetailsSliverAppBarView extends StatelessWidget {
               top: 0.0,
               left: 0,
               right: 0,
-              child: MovieDetailsAppBarImageView()
-              // Icon(Icons.message,
-              //     size: 128.0, color: Colors.greenAccent[400]), //Icon
+              child: MovieDetailsAppBarImageView(mMovie?.backDropPath??"")
             ), //Positioned
             /** Positioned WIdget **/
 
@@ -92,7 +167,7 @@ class MovieDetailsSliverAppBarView extends StatelessWidget {
               top: 180,
               left: 16,
               child:
-              ImageOverlapView()
+              ImageOverlapView(mMovie?.posterPath??"")
 
             ), //Positioned
 
@@ -132,7 +207,9 @@ class MovieDetailsSliverAppBarView extends StatelessWidget {
                 // color: PRIMARY_COLOR,
                 height: 150,
                 width: MediaQuery.of(context).size.width/1.5,
-                child: MoviesTypesView(genreList: genreList,),
+                child: MoviesTypesView(
+                  movieVO: mMovie,
+                ),
               )
               ),
           ],
@@ -143,13 +220,18 @@ class MovieDetailsSliverAppBarView extends StatelessWidget {
 }
 
 class ImageOverlapView extends StatelessWidget {
+  String mImageUrl;
+  ImageOverlapView(this.mImageUrl);
+
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 180,
       child: Row(
         children: [
-          Image.network("https://rukminim1.flixcart.com/image/416/416/k0bbb0w0/poster/u/h/a/medium-cute-minions-cartoon-wall-poster-for-children-high-original-imafk4xygze3chhh.jpeg?q=70",
+          Image.network(
+            // "https://rukminim1.flixcart.com/image/416/416/k0bbb0w0/poster/u/h/a/medium-cute-minions-cartoon-wall-poster-for-children-high-original-imafk4xygze3chhh.jpeg?q=70",
+            "$IMAGE_BASE_URL$mImageUrl",
             height: BEST_ACTOR_HEIGHT,
          ),
         ],
@@ -160,13 +242,12 @@ class ImageOverlapView extends StatelessWidget {
 
 class MoviesTypesView extends StatelessWidget {
 
-  const MoviesTypesView({
-    Key? key,
-    required this.genreList,
-  }) : super(key: key);
+  // Stri;ng? movieTitle;
+  // String? voteAverage;
+  // List<GenresVO>? genreList
+  MovieVO? movieVO;
 
-  final List<String> genreList;
-
+  MoviesTypesView({this.movieVO});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -176,13 +257,13 @@ class MoviesTypesView extends StatelessWidget {
         children: [
           Row(
             children: [
-              TypeText("Minions", Colors.white, TEXT_REGULAR_1X,isFontWeight: true),
+              TypeText(movieVO?.originalTitle??"", Colors.white, TEXT_REGULAR_1X,isFontWeight: true),
               SizedBox(width: MARGIN_MEDIUM,),
               Container(
                 child: Row(
                   children: [
                     Image.asset("assets/images/images_im.png",width: 45,height: 35,),
-                    TypeText("9.8", Colors.white, TEXT_REGULAR_1X,isFontWeight: true),
+                    TypeText(movieVO?.voteAverage.toString()??"", Colors.white, TEXT_REGULAR_1X,isFontWeight: true),
                   ],
                 ),
               )
@@ -190,7 +271,10 @@ class MoviesTypesView extends StatelessWidget {
           ),
 
           TypeText("2D,3D,3D IMAX,3D DBOX",Colors.white,TEXT_REGULAR_1X,isFontWeight: true,),
-          MoviesTypesList(genreList: genreList),
+          MoviesTypesList(
+              // genreList: genreList??[]
+              genreList: movieVO?.genres?.map((genre) => genre.name).toList()?? []
+          ),
         ],
       ),
     );
@@ -202,13 +286,13 @@ class MoviesTypesList extends StatelessWidget {
     Key? key,
     required this.genreList,
   }) : super(key: key);
-  final List<String> genreList;
+  final List<String?> genreList;
 
   @override
   Widget build(BuildContext context) {
     return Wrap(
         children:
-            genreList.map((genre) => GenreChipView(genre))
+            genreList.map((genre) => GenreChipView(genre??""))
                 .toList()
     );
   }
@@ -272,18 +356,23 @@ class ShareButtonView extends StatelessWidget {
 
 class MovieDetailsAppBarImageView extends StatelessWidget {
 
+  String mImageUrl;
+  MovieDetailsAppBarImageView(this.mImageUrl);
   @override
   Widget build(BuildContext context) {
     return Image.network(
-      "https://static1.squarespace.com/static/5591682fe4b0866b94533feb/t/56267c1ce4b030c0a6a34cc1/1445362716418/1000w/",
-      height: MediaQuery.of(context).size.height/3,
-      fit: BoxFit.cover,
+      // "https://static1.squarespace.com/static/5591682fe4b0866b94533feb/t/56267c1ce4b030c0a6a34cc1/1445362716418/1000w/",
+        "$IMAGE_BASE_URL$mImageUrl",
+        height: MediaQuery.of(context).size.height/3,
+        fit: BoxFit.cover,
     );
   }
 }
 
 class MoviesReleaseDateView extends StatelessWidget {
-  const MoviesReleaseDateView({Key? key}) : super(key: key);
+
+  String releaseDate;
+  MoviesReleaseDateView(this.releaseDate);
 
   @override
   Widget build(BuildContext context) {
@@ -297,7 +386,7 @@ class MoviesReleaseDateView extends StatelessWidget {
           MoviesDurationView("Censor Rating","U/A"),
           // SizedBox(width: MARGIN_SMALL,),
           Spacer(),
-          MoviesDurationView("Release date","May 3th 2022"),
+          MoviesDurationView("Release date", releaseDate),
           Spacer(),
           MoviesDurationView("Duration","2hr 15min")
         ],
@@ -342,9 +431,8 @@ class MoviesDurationView extends StatelessWidget {
 }
 
 class StoryLineView extends StatelessWidget {
-  const StoryLineView({
-    Key? key,
-  }) : super(key: key);
+ String storyLineBody;
+ StoryLineView(this.storyLineBody);
 
   @override
   Widget build(BuildContext context) {
@@ -355,7 +443,8 @@ class StoryLineView extends StatelessWidget {
         children: [
           TypeText("Story Line",Colors.white,TEXT_REGULAR_1X,isFontWeight: true,),
           SizedBox(height: MARGIN_MEDIUM_2,),
-          Text("Clare, a young Irish convict, chases a British officer through the rugged Tasmanian wilderness and is bent on revenge for a terrible act of violence the man committed against her family. On the way, she enlists the services of Aboriginal tracker Billy, who is marked by trauma from his own violence-filled past.",
+          Text(
+            storyLineBody,
             style: TextStyle(
                 color: Colors.white,
                 fontSize: TEXT_REGULAR,

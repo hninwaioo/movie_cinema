@@ -1,13 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:movie_cinema/network/responses/get_otp_response.dart';
 import 'package:movie_cinema/resources/dimens.dart';
 import 'package:movie_cinema/resources/strings.dart';
+import '../data/function/show_load_dialog.dart';
+import '../data/model/movie_model.dart';
+import '../data/model/movie_model_impl.dart';
 import '../resources/colors.dart';
 import '../widgets/login_page_upper_view.dart';
 import '../widgets/type_text.dart';
 import 'get_otp_view_page.dart';
 
-class LoginViewPage extends StatelessWidget {
+class LoginViewPage extends StatefulWidget {
+
+  @override
+  State<LoginViewPage> createState() => _LoginViewPageState();
+}
+
+class _LoginViewPageState extends State<LoginViewPage> {
+  MovieModel mMovieModel = MovieModelImpl();
+  OTPResponse? _otpResponse;
+
+  late String _phoneNo;
+  // late String _countryCode;
+  late String _completePhoneNumber;
+
+  void _getOTPRequest(String phoneNo){
+    print("Value_Phone==>$phoneNo");
+
+    mMovieModel.getOTP(phoneNo)?.then((value) {
+      setState((){
+        _completePhoneNumber = phoneNo;
+        print("Value=>$_completePhoneNumber");
+
+        if(value.code == 200){
+          Navigator.pop(context);
+          _navigateToGetOTPScreen(context,_completePhoneNumber);
+        }
+      });
+    }).catchError((error){
+      Navigator.pop(context);
+      debugPrint("ERROR=>${error.toString()}");
+    });
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +69,65 @@ class LoginViewPage extends StatelessWidget {
 
             SizedBox(height: MARGIN_MEDIUM_LARGE,),
 
-            PhoneNumberCodeSectionView(),
+            // PhoneNumberCodeSectionView(phoneNo: _phoneNo,),
+
+            Container(
+
+              margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_LARGE),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TypeText(COUNTRY_CODE, PRIMARY_HINT_COLOR, TEXT_REGULAR),
+                  Container(
+                    child: IntlPhoneField(
+                      dropdownIconPosition: IconPosition.trailing,
+                      dropdownIcon: Icon(Icons.keyboard_arrow_down,color: PRIMARY_HINT_COLOR,),
+                      showCountryFlag: false,
+                      style: TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                      labelText: 'Mobile Number',
+                      labelStyle: TextStyle(
+                          color: PRIMARY_HINT_COLOR
+                      ),
+                    // border: OutlineInputBorder(
+                    //   borderSide: BorderSide(
+                    //
+                    //     color: Colors.teal,
+                    //   ),
+                    // ),
+                    ),
+                    initialCountryCode: 'MM',
+                    initialValue: '95',
+                    cursorColor: PRIMARY_HINT_COLOR,
+
+                    onChanged: (phone) {
+                      _phoneNo = phone.number;
+                      print(phone.number);
+                    },
+                    onCountryChanged: (country) {
+
+                        // _countryCode = country.dialCode;
+                      print('Country changed to: ' + country.dialCode);
+
+                      print('Country changed to: ' + country.name);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
 
             SizedBox(height: MARGIN_MEDIUM_LARGE,),
 
             GestureDetector(
               onTap: (){
-                _navigateToGetOTPScreen(context);
+                // _navigateToGetOTPScreen(context);
+                showLoginDialog(context);
+                _completePhoneNumber = "09${_phoneNo}";
+
+                print("CompleteValuePhone====>$_completePhoneNumber");
+                _getOTPRequest(_completePhoneNumber);
+
               },
               child:  LoginButtonScreenButtonView(
                 VERIFY_PHONE_NUMBER,
@@ -65,22 +154,24 @@ class LoginViewPage extends StatelessWidget {
     );
   }
 
-  Future<dynamic> _navigateToGetOTPScreen(BuildContext context) {
+  Future<dynamic> _navigateToGetOTPScreen(BuildContext context,String phoneNo) {
     return Navigator.push(context, MaterialPageRoute(
-        builder: (context) => GetOTPViewPage()
+        builder: (context) => GetOTPViewPage(phoneNo: phoneNo,)
     )
     );
   }
 }
 
 class PhoneNumberCodeSectionView extends StatelessWidget {
-  const PhoneNumberCodeSectionView({
-    Key? key,
-  }) : super(key: key);
+
+  String? phoneNo;
+  PhoneNumberCodeSectionView({this.phoneNo});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return
+
+      Container(
       margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_LARGE),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,16 +181,26 @@ class PhoneNumberCodeSectionView extends StatelessWidget {
             child: IntlPhoneField(
 
               dropdownIconPosition: IconPosition.trailing,
-              dropdownIcon: Icon(Icons.arrow_drop_down,),
+              dropdownIcon: Icon(Icons.keyboard_arrow_down,color: PRIMARY_HINT_COLOR,),
               showCountryFlag: false,
+              style: TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'Mobile Number',
                 labelStyle: TextStyle(
                   color: PRIMARY_HINT_COLOR
                 ),
+                // border: OutlineInputBorder(
+                //   borderSide: BorderSide(
+                //
+                //     color: Colors.teal,
+                //   ),
+                // ),
               ),
               initialCountryCode: 'MM',
+              cursorColor: PRIMARY_HINT_COLOR,
+
               onChanged: (phone) {
+                phoneNo = phone.completeNumber;
                 print(phone.completeNumber);
               },
               onCountryChanged: (country) {

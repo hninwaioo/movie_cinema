@@ -6,13 +6,42 @@ import 'package:movie_cinema/resources/colors.dart';
 import 'package:movie_cinema/resources/dimens.dart';
 import 'package:movie_cinema/resources/strings.dart';
 import 'package:movie_cinema/widgets/type_text.dart';
+import '../data/vos/movie_now_and_coming_soon/movie_vo.dart';
+import '../data/vos/snack/add_snack_list_vo.dart';
+import '../viewsitems/curve_booking_button_view.dart';
 
-class CheckOutDialogViewPage extends StatelessWidget{
+class CheckOutDialogViewPage extends StatefulWidget{
+
+  MovieVO? mMovieVO;
+  int? cinemaDayTimeSlots;
+  String? startTime;
+  String? completeDate;
+  List<AddSnackListVO>? addSnackListVO;
+
+  CheckOutDialogViewPage({
+    required this.mMovieVO,
+    required this.cinemaDayTimeSlots,
+    required this.startTime,
+    required this.completeDate,
+    required this.addSnackListVO});
+
+  @override
+  State<CheckOutDialogViewPage> createState() => _CheckOutDialogViewPageState();
+}
+
+class _CheckOutDialogViewPageState extends State<CheckOutDialogViewPage> {
+
+  @override
+  void initState(){
+    super.initState();
+    print("CheckSnackList=>${widget.addSnackListVO}");
+
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
+
       backgroundColor: PRIMARY_COLOR,
       appBar: AppBar(
         backgroundColor: PRIMARY_COLOR,
@@ -30,7 +59,7 @@ class CheckOutDialogViewPage extends StatelessWidget{
           child: TypeText("Checkout", Colors.white, TEXT_REGULAR_1X,isFontWeight: true,),
         )
       ),
-      
+
       body: Column(
         children: [
           SizedBox(height: MARGIN_MEDIUM_2,),
@@ -38,16 +67,31 @@ class CheckOutDialogViewPage extends StatelessWidget{
           Expanded(
             child: ListView(
               children: [
-                TicketDetailPage(TICKET_CANCELION_POLICY,TICKET_POLICY),
+                TicketDetailPage(
+                  TICKET_CANCELION_POLICY,
+                  TICKET_POLICY,
+                  mMovieVO: widget.mMovieVO,
+                  cinemaDayTimeSlots: widget.cinemaDayTimeSlots,
+                  startTime: widget.startTime,
+                  completeDate: widget.completeDate,
+                  addSnackListVO: widget.addSnackListVO,),
               ],
             ),
           ),
           SizedBox(height: MARGIN_MEDIUM_LARGE,),
+
           GestureDetector(
-            onTap: (){
-              _navigateToPaymentScreen(context);
-            },
-            child: Image.asset("assets/images/continue_icon.png"),
+              onTap: (){
+                _navigateToPaymentScreen(context,
+                widget.mMovieVO,
+                widget.cinemaDayTimeSlots??0,
+                widget.startTime??"",
+                widget.completeDate??"",
+                widget.addSnackListVO);
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width/1.5,
+                  child: CurveBookingButtonView("Continue",Colors.black,SIGN_PHONE_NUMBER_BUTTON_COLOR))
 
           ),
           SizedBox(height: MARGIN_MEDIUM_LARGE,),
@@ -57,9 +101,22 @@ class CheckOutDialogViewPage extends StatelessWidget{
     );
   }
 
-  Future<dynamic> _navigateToPaymentScreen(BuildContext context) {
+  Future<dynamic> _navigateToPaymentScreen(
+      BuildContext context,
+      MovieVO? mMovieVO,
+      int cinemaDayTimeSlots,
+      String startTime,
+      String completeDate,
+      List<AddSnackListVO>? addSnackListVO
+      ) {
     return Navigator.push(context, MaterialPageRoute(
-        builder: (context) => PaymentViewPage()
+        builder: (context) => PaymentViewPage(
+          mMovieVO: mMovieVO,
+          cinemaDayTimeSlots: cinemaDayTimeSlots,
+          startTime: startTime,
+          completeDate: completeDate,
+          addSnackListVO: addSnackListVO,
+        )
     )
     );
   }

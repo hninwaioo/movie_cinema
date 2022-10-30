@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:movie_cinema/persistence/hive_constants.dart';
 part 'production_countries_vo.g.dart';
 @JsonSerializable()
-@HiveType(typeId: HIVE_TYPE_ID_PRODUCTION_COUNTRY_VO, adapterName: "ProductionCountryVO")
+@HiveType(typeId: HIVE_TYPE_ID_PRODUCTION_COUNTRY_VO, adapterName: "ProductionCountryVOAdapter")
 class ProductionCountriesVO {
 
   @JsonKey(name: "iso_3166_1")

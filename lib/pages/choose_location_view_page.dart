@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:movie_cinema/network/responses/get_set_city_response.dart';
+import 'package:movie_cinema/persistence/daos/city_dao.dart';
 import 'package:movie_cinema/resources/colors.dart';
 import 'package:movie_cinema/widgets/type_text.dart';
-
 import '../data/function/show_load_dialog.dart';
 import '../data/model/movie_model.dart';
 import '../data/model/movie_model_impl.dart';
 import '../data/vos/cities_vo.dart';
 import '../resources/dimens.dart';
-import 'home_navidation_view_page.dart';
+import 'home_navigation_view_page.dart';
 
 class ChooseLocationViewPage extends StatefulWidget {
 
@@ -28,13 +28,22 @@ class _ChooseLocationViewPageState extends State<ChooseLocationViewPage> {
     super.initState();
 
     /// Cities List
-    mMovieModel.getCities().then((citiesList) {
-      setState(() {
+    // mMovieModel.getCities().then((citiesList) {
+    //   setState(() {
+    //     mCitiesList = citiesList;
+    //     print("mCitiesList==>${mCitiesList}");
+    //   });
+    // }).catchError((error) {
+    //   debugPrint("ERROR=>>${error.toString()}");
+    // });
+
+    /// Cities List DataBase
+    mMovieModel.getCitiesFromDatabase().listen((citiesList){
+      setState((){
         mCitiesList = citiesList;
-        print("mCitiesList==>${mCitiesList}");
       });
-    }).catchError((error) {
-      debugPrint("ERROR=>>${error.toString()}");
+    }).onError((error){
+      debugPrint("ERROR=>${error.toString()}");
     });
 
   }
@@ -147,6 +156,7 @@ class SearchLocationSectionView extends StatelessWidget {
 }
 
 Future<dynamic> _navigateToHomeNavigationScreen(BuildContext context) {
+
   return Navigator.push(context, MaterialPageRoute(
       builder: (context) => HomeNavigationViewPage()
   )
@@ -164,16 +174,38 @@ class CitiesListSectionView extends StatefulWidget {
 class _CitiesListSectionViewState extends State<CitiesListSectionView> {
 
   MovieModel mMovieModel = MovieModelImpl();
-  String token = "Bearer 14677|TBdKG0ByjbrAmkHX3317oN1aMljYh1nZK1Ug5M86";
+
   SetCityResponse? setCityResponse;
+
+  String? checkToken;
+
+  CityDao mCityDao = CityDao();
+
+  @override
+  void initState(){
+    super.initState();
+
+    mMovieModel.signInWithPhoneNumberFromDatabase(201)?.then((user) {
+      if(user.token != null){
+        checkToken = user.token;
+      }
+
+    }).catchError((error){
+      debugPrint(error.toString());
+    });
+
+  }
 
   void _setCity(int cityId){
 
-    mMovieModel.setCity(token, cityId)?.then((city) {
+    print("objectUserToken=>${checkToken}");
+
+    mMovieModel.setCity("Bearer ${checkToken}", cityId)?.then((city) {
       setState((){
         setCityResponse = city;
         if(city.code == 200){
           Navigator.pop(context);
+
           _navigateToHomeNavigationScreen(context);
 
         }else{
@@ -226,6 +258,8 @@ class _CitiesListSectionViewState extends State<CitiesListSectionView> {
                            print("CityId=>${cityId}");
                            showLoginDialog(context);
                            _setCity(widget.mCitiesList?[index].id??0);
+                           mCityDao.savedCityName(widget.mCitiesList?[index]);
+
                          }),
 
                      Divider(

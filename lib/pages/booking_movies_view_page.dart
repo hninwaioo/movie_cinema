@@ -4,27 +4,27 @@ import 'package:movie_cinema/resources/dimens.dart';
 import '../data/model/movie_model.dart';
 import '../data/model/movie_model_impl.dart';
 import '../data/vos/cinema/cinema_vo.dart';
-import '../data/vos/cinema_timesolts/cinema_data_vo.dart';
-import '../data/vos/cinema_timesolts/config_value_list_vo.dart';
-import '../data/vos/cinema_timesolts/time_solts_vo.dart';
+import '../data/vos/cinema_timeslots/cinema_data_vo.dart';
+import '../data/vos/cinema_timeslots/config_data_vo.dart';
+import '../data/vos/cinema_timeslots/config_value_list_vo.dart';
 import '../data/vos/movie_now_and_coming_soon/movie_vo.dart';
 import '../data/vos/seven_days_date_vo.dart';
-import '../network/responses/get_cinema_response.dart';
-import '../network/responses/get_config_response.dart';
 import '../resources/colors.dart';
-import '../viewsitems/booking_movies_date_item_view.dart';
-import '../viewsitems/booking_movies_types_item_view.dart';
-import '../viewsitems/cinema_item_view.dart';
-import 'home_navidation_view_page.dart';
+import '../view_items/booking_movies_date_item_view.dart';
+import '../view_items/booking_movies_types_item_view.dart';
+import '../view_items/cinema_item_view.dart';
+import 'home_navigation_view_page.dart';
 import 'package:intl/intl.dart';
 
 class BookingMoviesViewPage extends StatefulWidget {
 
-  ConfigResponse configResponse;
-  CinemaResponse cinemaResponse;
+  List<ConfigDataVO>? configDataList;
+  List<ConfigValueListVO>? configValueList;
+  List<CinemaVO>? cinemaList;
+
   MovieVO? mMovieVO;
 
-  BookingMoviesViewPage({required this.configResponse, required this.cinemaResponse, required this.mMovieVO});
+  BookingMoviesViewPage({required this.configDataList,required this.configValueList, required this.cinemaList, required this.mMovieVO});
 
   @override
   State<BookingMoviesViewPage> createState() => _BookingMoviesViewPageState();
@@ -55,11 +55,34 @@ class _BookingMoviesViewPageState extends State<BookingMoviesViewPage> {
   var cinemaId;
   Color? _color;
 
+  String? checkToken;
+
   @override
   void initState(){
     super.initState();
 
-    cinemaList = widget.cinemaResponse.cinemaList;
+    mMovieModel.signInWithPhoneNumberFromDatabase(201)?.then((user) {
+      if(user.token != null){
+        checkToken = user.token;
+        print("objectCheckToken==${checkToken}");
+
+        mMovieModel.getCinemaTimeslot("Bearer ${checkToken}", firstSelectedDate??"")
+            .then((cinemaTimeslot){
+          setState((){
+            // this._cinemaTimeslotsResponse = cinemaTimeslot;
+            this.cinemaTimeSlotsList = cinemaTimeslot;
+            cinemaId = cinemaTimeSlotsList?.map((e) => e.cinemaId);
+
+          });
+        }).catchError((error) {
+          debugPrint("ERROR=>${error.toString()}");
+        });
+      }
+    }).catchError((error){
+      debugPrint(error.toString());
+    });
+
+    cinemaList = widget.cinemaList;
 
     var cinema_id = cinemaList?.map((e) => e.id);
 
@@ -97,36 +120,27 @@ class _BookingMoviesViewPageState extends State<BookingMoviesViewPage> {
       print("selected_Date=>${selectedDate}");
     }
 
-    mMovieModel.getCinemaTimeslot("Bearer 14677|TBdKG0ByjbrAmkHX3317oN1aMljYh1nZK1Ug5M86", firstSelectedDate??"")
-        ?.then((cinemaTimeslot){
-      setState((){
-        this._cinemaTimeslotsResponse = cinemaTimeslot;
-        this.cinemaTimeSlotsList = cinemaTimeslot.cinemaDataVO;
-        cinemaId = cinemaTimeSlotsList?.map((e) => e.cinemaId);
-
-      });
-    }).catchError((error) {
-      debugPrint("ERROR=>${error.toString()}");
-    });
-
+    // mMovieModel.getCinemaTimeslot("Bearer ${checkToken}", firstSelectedDate??"")
+    //     .then((cinemaTimeslot){
+    //   setState((){
+    //     // this._cinemaTimeslotsResponse = cinemaTimeslot;
+    //     this.cinemaTimeSlotsList = cinemaTimeslot;
+    //     cinemaId = cinemaTimeSlotsList?.map((e) => e.cinemaId);
+    //
+    //   });
+    // }).catchError((error) {
+    //   debugPrint("ERROR=>${error.toString()}");
+    // });
   }
 
   void onTapSelectedDate(String dateSelected){
 
-    mMovieModel.getCinemaTimeslot("Bearer 14677|TBdKG0ByjbrAmkHX3317oN1aMljYh1nZK1Ug5M86", dateSelected)
-        ?.then((cinemaTimeslot){
+    mMovieModel.getCinemaTimeslot("Bearer ${checkToken}", dateSelected)
+        .then((cinemaTimeslot){
       setState((){
-        this._cinemaTimeslotsResponse = cinemaTimeslot;
-        this.cinemaTimeSlotsList = cinemaTimeslot.cinemaDataVO;
+        this.cinemaTimeSlotsList = cinemaTimeslot;
         cinemaId = cinemaTimeSlotsList?.map((e) => e.cinemaId);
         selectedDate = true;
-
-        // if(selectedDate == true){
-        //   _color = SIGN_PHONE_NUMBER_BUTTON_COLOR;
-        // }else{
-        //   _color = Colors.white;
-        // }
-        // sevenDaysDateVO = SevenDaysDateVO(completeDate: completeDate,day: day,dayDate: dayDate,month: month,selectedDate: selectedDate??true);
 
       });
     }).catchError((error) {
@@ -162,9 +176,7 @@ class _BookingMoviesViewPageState extends State<BookingMoviesViewPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row(
-            //   children: dates.map((widget) => Expanded(child: widget)).toList(),
-            // ),
+
             SizedBox(height: MARGIN_MEDIUM_LARGE,),
             BookingMoviesDateItemView(
               selectedColor: selectedDate??false,
@@ -173,15 +185,14 @@ class _BookingMoviesViewPageState extends State<BookingMoviesViewPage> {
                   onTapSelectedDate(completeDate);
                   print("SelectedDate=>${selectedDate}");
 
-                  setState((){
-                    if(selectedDate == true){
-                      _color = SIGN_PHONE_NUMBER_BUTTON_COLOR;
-                    }else{
-                      _color = Colors.white;
-                    }
-                    // sevenDaysDateVO = SevenDaysDateVO(completeDate: completeDate,day: day,dayDate: dayDate,month: month,selectedDate: selectedDate??true);
+                  // setState((){
+                  //   if(selectedDate == true){
+                  //     _color = SIGN_PHONE_NUMBER_BUTTON_COLOR;
+                  //   }else{
+                  //     _color = Colors.white;
+                  //   }
+                  // }
 
-                  });
               },
             ),
 
@@ -189,10 +200,11 @@ class _BookingMoviesViewPageState extends State<BookingMoviesViewPage> {
             BookingMoviesTypesItemView(),
             SizedBox(height: MARGIN_MEDIUM_LARGE,),
 
-            // AvailableMoviesView(widget.configResponse.configDataVO.),
+            AvailableMoviesView(widget.configValueList),
 
             Container(
               height: MediaQuery.of(context).size.height/2,
+              margin: EdgeInsets.only(top: 16),
               child: (cinemaTimeSlotsList!=null)
                 ?
               ListView.builder(
@@ -200,12 +212,15 @@ class _BookingMoviesViewPageState extends State<BookingMoviesViewPage> {
                   padding: EdgeInsets.only(left: MARGIN_MEDIUM_2),
                   itemCount: cinemaList?.length,
                   itemBuilder:(BuildContext context, int index){
-                    return CinemaNameDetailView(
-                      cinemaData: cinemaList?[index],
-                      cinemaTimeSlots: cinemaTimeSlotsList?[index].timeslots,
-                      mMovieVO: widget.mMovieVO,
-                      completeDate: completeDate,
-
+                    return Wrap(
+                      children: [
+                          CinemaNameDetailView(
+                          cinemaData: cinemaList?[index],
+                          cinemaTimeSlots: cinemaTimeSlotsList?[index].timeslots,
+                          mMovieVO: widget.mMovieVO,
+                          completeDate: completeDate,
+                        )
+                      ],
                     );
                   }
               ):
@@ -249,29 +264,23 @@ class AvailableMoviesView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: MARGIN_XLARGE,
+      width: double.infinity,
       color: AVAILABLE_MOVIES_BACKGROUND_COLOR,
       padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-      child:
-      // Row(
-      //   children: [
-      //     AvailableMoviesItems("Available",AVAILABLE_MOVIES_COLOR),
-      //     Spacer(),
-      //     AvailableMoviesItems("Filling",FILLING_MOVIES_COLOR),
-      //     Spacer(),
-      //     AvailableMoviesItems("Almost Full",ALMOSTFULL_MOVIES_COLOR)
-      //   ],
-      // ),
-      ListView.builder(
+      child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          // padding: EdgeInsets.only(left: MARGIN_MEDIUM_2),
-          //            genreList.map((genre) => GenreChipView(genre??""))
           itemCount: configValueListVO?.length,
-
+          shrinkWrap: true,
           itemBuilder:(BuildContext context, int index){
-            return Row(
-              children: [
-                AvailableMoviesItems(configValueListVO?[index]),
-                // SizedBox(width: MARGIN_MEDIUM_2,)
+            return
+              // AvailableMoviesItems(configValueListVO?[index]);
+
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  AvailableMoviesItems(configValueListVO?[index]),
+                  SizedBox(width: MARGIN_MEDIUM_2,)
               ],
             );
           }
@@ -295,11 +304,11 @@ class _AvailableMoviesItemsState extends State<AvailableMoviesItems> {
   void initState(){
     super.initState();
     if(widget.configValueListVO?.color == "#00FFA3"){
-      _color = 0x00ffa3;
+      _color = 0xff00ffa3;
     }else if(widget.configValueListVO?.color == "#FF7A00"){
-      _color = 0xff7a00;
+      _color = 0xffff7a00;
     }else{
-      _color = 0xFF00B8;
+      _color = 0xffFF00B8;
     }
   }
 
@@ -307,6 +316,8 @@ class _AvailableMoviesItemsState extends State<AvailableMoviesItems> {
   Widget build(BuildContext context) {
     return Container(
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.asset("assets/images/ellipse.png",color: Color(_color),width: 6,height: 6,
           fit: BoxFit.cover,),

@@ -3,7 +3,7 @@ class SevenDaysDateVO {
   String? day;
   String? month;
   String? dayDate;
-  bool selectedDate=true;
+  bool selectedDate=false;
 
   SevenDaysDateVO({
     required this.completeDate,

@@ -7,7 +7,6 @@ import 'package:movie_cinema/resources/colors.dart';
 import 'package:movie_cinema/resources/dimens.dart';
 import 'package:movie_cinema/resources/strings.dart';
 import 'package:movie_cinema/widgets/type_text.dart';
-
 import '../data/function/show_load_dialog.dart';
 import '../data/model/movie_model.dart';
 import '../data/model/movie_model_impl.dart';
@@ -16,6 +15,7 @@ import '../data/vos/payment_vo.dart';
 import '../data/vos/snack/add_snack_list_vo.dart';
 
 class PaymentViewPage extends StatefulWidget {
+  String? cinemaName;
   MovieVO? mMovieVO;
   int? cinemaDayTimeSlots;
   String? startTime;
@@ -23,6 +23,7 @@ class PaymentViewPage extends StatefulWidget {
   List<AddSnackListVO>? addSnackListVO;
 
   PaymentViewPage({
+    required this.cinemaName,
     required this.mMovieVO,
     required this.cinemaDayTimeSlots,
     required this.startTime,
@@ -35,7 +36,7 @@ class PaymentViewPage extends StatefulWidget {
 
 class _PaymentViewPageState extends State<PaymentViewPage> {
   MovieModel mMovieModel = MovieModelImpl();
-  String token = "Bearer 14677|TBdKG0ByjbrAmkHX3317oN1aMljYh1nZK1Ug5M86";
+  String? checkToken;
 
   List<PaymentVO>? paymentList;
   CheckOutResponse? checkOutResponse;
@@ -44,14 +45,55 @@ class _PaymentViewPageState extends State<PaymentViewPage> {
   void initState(){
     super.initState();
 
-    mMovieModel.getPaymentType(token)
-    .then((payment){
-      setState((){
-        this.paymentList = payment;
-      });
+    mMovieModel.signInWithPhoneNumberFromDatabase(201)?.then((user) {
+      if(user.token != null){
+        checkToken = user.token;
+
+        /// getPaymentType API
+        // mMovieModel.getPaymentType("Bearer ${checkToken}")
+        //     .then((payment){
+        //   setState((){
+        //     this.paymentList = payment;
+        //   });
+        // }).catchError((error){
+        //   debugPrint("ERROR=>${error.toString()}");
+        // });
+
+        /// getPaymentType DATABASE
+        mMovieModel.getPaymentTypesFromDatabase("Bearer ${checkToken}")
+            .listen((payment){
+          setState((){
+            this.paymentList = payment;
+          });
+        }).onError((error){
+          debugPrint("ERROR=>${error.toString()}");
+        });
+
+      }
     }).catchError((error){
-      debugPrint("ERROR=>${error.toString()}");
+      debugPrint(error.toString());
     });
+
+    // /// getPaymentType API
+    // mMovieModel.getPaymentType("Bearer ${checkToken}")
+    // .then((payment){
+    //   setState((){
+    //     this.paymentList = payment;
+    //   });
+    // }).catchError((error){
+    //   debugPrint("ERROR=>${error.toString()}");
+    // });
+
+    // /// getPaymentType DATABASE
+    // mMovieModel.getPaymentTypesFromDatabase(checkToken)
+    //     .listen((payment){
+    //   setState((){
+    //     this.paymentList = payment;
+    //   });
+    // }).onError((error){
+    //   debugPrint("ERROR=>${error.toString()}");
+    // });
+
   }
 
   void _CheckOutPayment(String token, PostCheckOutDataVO postCheckOutDataVO){
@@ -64,6 +106,7 @@ class _PaymentViewPageState extends State<PaymentViewPage> {
               Navigator.pop(context);
               _navigateToTicketConfirmScreen(
                   context,
+                widget.cinemaName,
                 widget.mMovieVO,
                 widget.cinemaDayTimeSlots??0,
                 widget.startTime??"",
@@ -174,7 +217,7 @@ class _PaymentViewPageState extends State<PaymentViewPage> {
 
                 PostCheckOutDataVO postCheckOutDataVO = PostCheckOutDataVO(
                     cinemaDayTimeslotId: widget.cinemaDayTimeSlots,
-                    seatNumber: "G-8",
+                    seatNumber: "G-3",
                     bookingDate: widget.completeDate,
                     movieId: widget.mMovieVO?.id,
                     paymentTypeId: 1,
@@ -182,7 +225,7 @@ class _PaymentViewPageState extends State<PaymentViewPage> {
                 );
 
                 showLoginDialog(context);
-                _CheckOutPayment(token,postCheckOutDataVO);
+                _CheckOutPayment("Bearer ${checkToken}",postCheckOutDataVO);
 
               },
             )
@@ -205,27 +248,6 @@ class PaymentTypesSectionView extends StatelessWidget {
     return Container(
       margin: EdgeInsets.all(MARGIN_MEDIUM_LARGE),
       child:
-
-      // Column(
-      //   crossAxisAlignment: CrossAxisAlignment.start,
-      //   children: [
-      //     // PaymentTypesView("assets/images/payment_upi_icon.png","UPI"),
-      //     // SizedBox(height: MARGIN_MEDIUM_2,),
-      //     // PaymentTypesView("assets/images/payment_gift_voucher.png","Gift Voucher"),
-      //     // SizedBox(height: MARGIN_MEDIUM_2,),
-      //     // PaymentTypesView("assets/images/payment_quick_pay.png","Quick Pay"),
-      //     // SizedBox(height: MARGIN_MEDIUM_2,),
-      //     // PaymentTypesView("assets/images/payment_credit_card.png","Credit Card/Debit Card"),
-      //     // SizedBox(height: MARGIN_MEDIUM_2,),
-      //     // PaymentTypesView("assets/images/payment_redeem_point.png","Redeem Point"),
-      //     // SizedBox(height: MARGIN_MEDIUM_2,),
-      //     // PaymentTypesView("assets/images/payment_mobile_wallet.png","Mobile Wallet"),
-      //     // SizedBox(height: MARGIN_MEDIUM_2,),
-      //     // PaymentTypesView("assets/images/payment_net_banking.png","Net Banking"),
-      //
-      //   ],
-      // ),
-
       Container(
         height: MediaQuery.of(context).size.height/2,
         child:
@@ -312,6 +334,7 @@ class PaymentTypesView extends StatelessWidget {
 
 Future<dynamic> _navigateToTicketConfirmScreen(
     BuildContext context,
+    String? cinemaName,
     MovieVO? mMovieVO,
     int cinemaDayTimeSlots,
     String startTime,
@@ -320,6 +343,7 @@ Future<dynamic> _navigateToTicketConfirmScreen(
     ) {
   return Navigator.push(context, MaterialPageRoute(
       builder: (context) => TicketConfirmationViewPage(
+        cinemaName: cinemaName,
         mMovieVO: mMovieVO,
         cinemaDayTimeSlots: cinemaDayTimeSlots,
         startTime: startTime,

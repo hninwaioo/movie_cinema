@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:movie_cinema/data/vos/movie_now_and_coming_soon/credit_cast_vo.dart';
-import 'package:movie_cinema/data/vos/movie_now_and_coming_soon/genres_vo.dart';
 import '../data/model/movie_model.dart';
 import '../data/model/movie_model_impl.dart';
+import '../data/vos/cinema/cinema_vo.dart';
+import '../data/vos/cinema_timeslots/config_data_vo.dart';
+import '../data/vos/cinema_timeslots/config_value_list_vo.dart';
 import '../data/vos/movie_now_and_coming_soon/movie_vo.dart';
 import '../network/api_constant.dart';
-import '../network/responses/get_cinema_response.dart';
-import '../network/responses/get_config_response.dart';
 import '../resources/colors.dart';
 import '../resources/dimens.dart';
 import '../widgets/cast_section_view.dart';
@@ -14,15 +14,17 @@ import '../widgets/movies_detail_message_view.dart';
 import '../widgets/play_button_view.dart';
 import '../widgets/type_text.dart';
 import 'booking_movies_view_page.dart';
-import '../viewsitems/curve_booking_button_view.dart';
+import '../view_items/curve_booking_button_view.dart';
 
 class MoviesDetailPage extends StatefulWidget {
 
   int movieId;
   String playMovies;
-  ConfigResponse configResponse;
-  CinemaResponse cinemaResponse;
-  MoviesDetailPage(this.movieId, this.playMovies, this.configResponse, this.cinemaResponse);
+
+  List<ConfigDataVO>? configDataList;
+  List<ConfigValueListVO>? configValueList;
+  List<CinemaVO>? cinemaList;
+  MoviesDetailPage(this.movieId, this.playMovies, this.configDataList, this.configValueList,this.cinemaList);
 
   @override
   State<MoviesDetailPage> createState() => _MoviesDetailPageState();
@@ -46,6 +48,15 @@ class _MoviesDetailPageState extends State<MoviesDetailPage> {
       debugPrint("ERROR=>${error.toString()}");
     });
 
+    mMovieModel.getMovieDetailsFromDatabase(widget.movieId)
+        .then((movie) {
+      setState((){
+        this.mMovieVO = movie;
+      });
+    }).catchError((error){
+      debugPrint("ERROR=>${error.toString()}");
+    });
+
     if(widget.playMovies == "NOW"){
       _isVisible = false;
     }else{
@@ -56,7 +67,6 @@ class _MoviesDetailPageState extends State<MoviesDetailPage> {
       .then((castList) {
       setState((){
         print("mMovieModel=>$mMovieModel");
-
         this.mCastList = castList;
       });
     }).catchError((error) {
@@ -64,70 +74,86 @@ class _MoviesDetailPageState extends State<MoviesDetailPage> {
     });
   }
 
-
   bool _isVisible = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: PRIMARY_COLOR,
-      body: Container(
-        child: (mMovieVO !=null)
-          ?
-          CustomScrollView(
-          slivers: [
-            MovieDetailsSliverAppBarView(
-                    () => Navigator.pop(context),
-              mMovieVO
-            ),
+    return Stack(
+      children: [
 
-            SliverList(
-                delegate: SliverChildListDelegate(
-                    [
-                      SizedBox(height: MARGIN_MEDIUM_2,),
-                      MoviesReleaseDateView(mMovieVO?.releaseDate??""),
-                      SizedBox(height: MARGIN_MEDIUM,),
+        Positioned.fill(
 
-                      Visibility(
-                          visible: _isVisible,
-                          child: MovieDetailMessageView(),
+            child: Container(
+              color: PRIMARY_COLOR,
+                child: (mMovieVO !=null)
+                    ?
+                CustomScrollView(
+                  slivers: [
+                    MovieDetailsSliverAppBarView(
+                            () => Navigator.pop(context),
+                        mMovieVO
+                    ),
 
-                      ),
+                    SliverList(
+                        delegate: SliverChildListDelegate(
+                            [
+                              SizedBox(height: MARGIN_MEDIUM_2,),
+                              MoviesReleaseDateView(mMovieVO?.releaseDate??""),
+                              SizedBox(height: MARGIN_MEDIUM,),
 
-                      SizedBox(height: MARGIN_MEDIUM,),
-                      StoryLineView(mMovieVO?.overview??""),
-                      SizedBox(height: MARGIN_MEDIUM,),
+                              Visibility(
+                                visible: _isVisible,
+                                child: MovieDetailMessageView(),
+                              ),
 
-                      CastSectionView(
-                          castList: mCastList??[]
-                      ),
+                              SizedBox(height: MARGIN_MEDIUM,),
+                              StoryLineView(mMovieVO?.overview??""),
+                              SizedBox(height: MARGIN_MEDIUM,),
 
-                      GestureDetector(
-                        onTap: (){
-                          _navigateToBookingMoviesScreen(context,widget.configResponse,widget.cinemaResponse,mMovieVO);
-                        },
-                        child: Container(
-                            width: 100,
-                            // MediaQuery.of(context).size.width/3,
-                            child: CurveBookingButtonView("Booking",Colors.black,SIGN_PHONE_NUMBER_BUTTON_COLOR))
-                      ),
-                      SizedBox(height: MARGIN_MEDIUM_2,),
-                    ]
+                              CastSectionView(
+                                  castList: mCastList??[]
+                              ),
+
+                            ]
+                        )
+                    )
+                  ],
                 )
-            )
-          ],
+                    : Center(
+                  child: CircularProgressIndicator(),
+                )
+            ),
+        ),
+
+        Positioned(
+          // alignment: Alignment.bottomRight,
+
+          bottom: 1,
+          right: 10,
+          left: 10,
+          child: Column(
+            children: [
+              GestureDetector(
+                  onTap: (){
+                    _navigateToBookingMoviesScreen(context,widget.configDataList??[],widget.configValueList??[],widget.cinemaList??[],mMovieVO);
+                  },
+                  child: Container(
+                      width: 200,
+                      child: CurveBookingButtonView("Booking",Colors.black,SIGN_PHONE_NUMBER_BUTTON_COLOR)
+                  )
+              ),
+              SizedBox(height: MARGIN_MEDIUM_2,),
+            ],
+          ),
         )
-            : Center(
-          child: CircularProgressIndicator(),
-        )
-      )
+      ],
     );
   }
 
-  Future<dynamic> _navigateToBookingMoviesScreen(BuildContext context, ConfigResponse configResponse, CinemaResponse cinemaResponse,  MovieVO? mMovieVO
+  Future<dynamic> _navigateToBookingMoviesScreen(BuildContext context, List<ConfigDataVO> configDataList, List<ConfigValueListVO>? configValueList,List<CinemaVO> cinemaList,  MovieVO? mMovieVO
   ) {
     return Navigator.push(context, MaterialPageRoute(
-        builder: (context) => BookingMoviesViewPage(configResponse: configResponse, cinemaResponse: cinemaResponse,mMovieVO: mMovieVO,)
+        builder: (context) => BookingMoviesViewPage(configDataList: configDataList, configValueList: configValueList, cinemaList: cinemaList,mMovieVO: mMovieVO,)
     )
     );
   }
@@ -139,12 +165,6 @@ class MovieDetailsSliverAppBarView extends StatelessWidget {
   MovieVO? mMovie;
   MovieDetailsSliverAppBarView(this.onTapBack,this.mMovie);
 
-  final List<String> genreList = [
-    "Action",
-    "Adventure",
-    "Drama",
-    "Animation"
-  ];
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
@@ -152,19 +172,19 @@ class MovieDetailsSliverAppBarView extends StatelessWidget {
       backgroundColor: PRIMARY_COLOR,
       expandedHeight: MOVIE_DETAILS_SCREEN_APP_BAR_HEIGHT,
       flexibleSpace: FlexibleSpaceBar(
-        background:
-        Stack(
+        background: Stack(
           children: [
             Positioned(
               top: 0.0,
               left: 0,
               right: 0,
+              height: MediaQuery.of(context).size.height/3.5,
               child: MovieDetailsAppBarImageView(mMovie?.backDropPath??"")
             ), //Positioned
             /** Positioned WIdget **/
 
             Positioned(
-              top: 180,
+              top: 160,
               left: 16,
               child:
               ImageOverlapView(mMovie?.posterPath??"")
@@ -183,6 +203,7 @@ class MovieDetailsSliverAppBarView extends StatelessWidget {
                 ),
               ),
             ),
+
             Align(
               alignment: Alignment.topRight,
               child: Padding(
@@ -195,18 +216,15 @@ class MovieDetailsSliverAppBarView extends StatelessWidget {
             ),
 
             Align(
-                alignment: Alignment.center,
-                child: PlayButtonView()
-            ),
-            Align(
               alignment: Alignment.bottomRight,
               child: Container(
+                alignment: Alignment.bottomLeft,
                   padding: EdgeInsets.only(
                       left: MARGIN_MEDIUM_LARGE
                   ),
                 // color: PRIMARY_COLOR,
-                height: 150,
-                width: MediaQuery.of(context).size.width/1.5,
+                height: 220,
+                width: MediaQuery.of(context).size.width/1.6,
                 child: MoviesTypesView(
                   movieVO: mMovie,
                 ),
@@ -226,13 +244,13 @@ class ImageOverlapView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 180,
+      height: 200,
       child: Row(
         children: [
           Image.network(
-            // "https://rukminim1.flixcart.com/image/416/416/k0bbb0w0/poster/u/h/a/medium-cute-minions-cartoon-wall-poster-for-children-high-original-imafk4xygze3chhh.jpeg?q=70",
             "$IMAGE_BASE_URL$mImageUrl",
             height: BEST_ACTOR_HEIGHT,
+            fit: BoxFit.cover,
          ),
         ],
       ),
@@ -242,9 +260,6 @@ class ImageOverlapView extends StatelessWidget {
 
 class MoviesTypesView extends StatelessWidget {
 
-  // Stri;ng? movieTitle;
-  // String? voteAverage;
-  // List<GenresVO>? genreList
   MovieVO? movieVO;
 
   MoviesTypesView({this.movieVO});
@@ -254,25 +269,33 @@ class MoviesTypesView extends StatelessWidget {
       child:
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Row(
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.start,
             children: [
-              TypeText(movieVO?.originalTitle??"", Colors.white, TEXT_REGULAR_1X,isFontWeight: true),
-              SizedBox(width: MARGIN_MEDIUM,),
-              Container(
-                child: Row(
-                  children: [
-                    Image.asset("assets/images/images_im.png",width: 45,height: 35,),
-                    TypeText(movieVO?.voteAverage.toString()??"", Colors.white, TEXT_REGULAR_1X,isFontWeight: true),
-                  ],
-                ),
-              )
+              TypeText(movieVO?.originalTitle??"", Colors.white, TEXT_REGULAR,isFontWeight: true),
+              SizedBox(width: MARGIN_SMALL,),
+
+              Image.asset("assets/images/images_im.png",width: 45,height: 35,),
+              SizedBox(width: 4,),
+              TypeText(movieVO?.voteAverage.toString()??"", Colors.white, TEXT_REGULAR,isFontWeight: true),
+
+              // Container(
+              //   child: Wrap(
+              //     // crossAxisAlignment: CrossAxisAlignment.center,
+              //     children: [
+              //       Image.asset("assets/images/images_im.png",width: 45,height: 35,),
+              //       SizedBox(width: 4,),
+              //       TypeText(movieVO?.voteAverage.toString()??"", Colors.white, TEXT_REGULAR,isFontWeight: true),
+              //     ],
+              //   ),
+              // )
             ],
           ),
 
-          TypeText("2D,3D,3D IMAX,3D DBOX",Colors.white,TEXT_REGULAR_1X,isFontWeight: true,),
+          TypeText("2D,3D,3D IMAX,3D DBOX",Colors.white,TEXT_REGULAR,isFontWeight: true,),
           MoviesTypesList(
-              // genreList: genreList??[]
               genreList: movieVO?.genres?.map((genre) => genre.name).toList()?? []
           ),
         ],
@@ -305,6 +328,11 @@ class GenreChipView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Wrap(
+      spacing: 1,
+      runSpacing: 1,
+      alignment: WrapAlignment.spaceBetween,
+      runAlignment: WrapAlignment.spaceBetween,
+
       children: [
         Chip(
             backgroundColor: SIGN_PHONE_NUMBER_BUTTON_COLOR,
@@ -321,7 +349,6 @@ class GenreChipView extends StatelessWidget {
     );
   }
 }
-
 
 class BackButtonView extends StatelessWidget {
   final Function onTapBack;
@@ -360,11 +387,23 @@ class MovieDetailsAppBarImageView extends StatelessWidget {
   MovieDetailsAppBarImageView(this.mImageUrl);
   @override
   Widget build(BuildContext context) {
-    return Image.network(
-      // "https://static1.squarespace.com/static/5591682fe4b0866b94533feb/t/56267c1ce4b030c0a6a34cc1/1445362716418/1000w/",
-        "$IMAGE_BASE_URL$mImageUrl",
-        height: MediaQuery.of(context).size.height/3,
-        fit: BoxFit.cover,
+    return Stack(
+      children: [
+        Positioned(
+          left: 0.0,
+            right: 0.0,
+            top: 0.0,
+            child: Image.network(
+              "$IMAGE_BASE_URL$mImageUrl",
+              height: MediaQuery.of(context).size.height/3,//2,
+              fit: BoxFit.cover,
+            )
+        ),
+        Align(
+          alignment: Alignment.center,
+            child: PlayButtonView()
+        )
+      ],
     );
   }
 }
@@ -384,7 +423,6 @@ class MoviesReleaseDateView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           MoviesDurationView("Censor Rating","U/A"),
-          // SizedBox(width: MARGIN_SMALL,),
           Spacer(),
           MoviesDurationView("Release date", releaseDate),
           Spacer(),
@@ -420,9 +458,9 @@ class MoviesDurationView extends StatelessWidget {
 
       child: Column(
         children: [
-          TypeText(text_1, Colors.white, TEXT_REGULAR,isFontWeight: true,),
+          TypeText(text_1, Colors.white, TEXT_REGULAR_SMALL,isFontWeight: true,),
           SizedBox(height: MARGIN_SMALL,),
-          TypeText(text, Colors.white, TEXT_REGULAR_1X,isFontWeight: true,)
+          TypeText(text, Colors.white, TEXT_REGULAR,isFontWeight: true,)
 
         ],
       ),
@@ -446,8 +484,11 @@ class StoryLineView extends StatelessWidget {
           Text(
             storyLineBody,
             style: TextStyle(
+              decoration: TextDecoration.none,
                 color: Colors.white,
                 fontSize: TEXT_REGULAR,
+              fontStyle: FontStyle.normal,
+              fontWeight: FontWeight.bold
             ),
           ),
           SizedBox(height: MARGIN_MEDIUM_2,),

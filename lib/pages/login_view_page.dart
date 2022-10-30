@@ -19,10 +19,8 @@ class LoginViewPage extends StatefulWidget {
 
 class _LoginViewPageState extends State<LoginViewPage> {
   MovieModel mMovieModel = MovieModelImpl();
-  OTPResponse? _otpResponse;
 
   late String _phoneNo;
-  // late String _countryCode;
   late String _completePhoneNumber;
 
   void _getOTPRequest(String phoneNo){
@@ -43,8 +41,6 @@ class _LoginViewPageState extends State<LoginViewPage> {
       debugPrint("ERROR=>${error.toString()}");
     });
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -69,8 +65,6 @@ class _LoginViewPageState extends State<LoginViewPage> {
 
             SizedBox(height: MARGIN_MEDIUM_LARGE,),
 
-            // PhoneNumberCodeSectionView(phoneNo: _phoneNo,),
-
             Container(
 
               margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_LARGE),
@@ -89,15 +83,9 @@ class _LoginViewPageState extends State<LoginViewPage> {
                       labelStyle: TextStyle(
                           color: PRIMARY_HINT_COLOR
                       ),
-                    // border: OutlineInputBorder(
-                    //   borderSide: BorderSide(
-                    //
-                    //     color: Colors.teal,
-                    //   ),
-                    // ),
                     ),
                     initialCountryCode: 'MM',
-                    initialValue: '95',
+                    // initialValue: '95',
                     cursorColor: PRIMARY_HINT_COLOR,
 
                     onChanged: (phone) {
@@ -106,7 +94,6 @@ class _LoginViewPageState extends State<LoginViewPage> {
                     },
                     onCountryChanged: (country) {
 
-                        // _countryCode = country.dialCode;
                       print('Country changed to: ' + country.dialCode);
 
                       print('Country changed to: ' + country.name);
@@ -121,7 +108,6 @@ class _LoginViewPageState extends State<LoginViewPage> {
 
             GestureDetector(
               onTap: (){
-                // _navigateToGetOTPScreen(context);
                 showLoginDialog(context);
                 _completePhoneNumber = "09${_phoneNo}";
 
@@ -189,12 +175,7 @@ class PhoneNumberCodeSectionView extends StatelessWidget {
                 labelStyle: TextStyle(
                   color: PRIMARY_HINT_COLOR
                 ),
-                // border: OutlineInputBorder(
-                //   borderSide: BorderSide(
-                //
-                //     color: Colors.teal,
-                //   ),
-                // ),
+
               ),
               initialCountryCode: 'MM',
               cursorColor: PRIMARY_HINT_COLOR,
@@ -284,7 +265,6 @@ class DividerORSectionView extends StatelessWidget {
               color: PRIMARY_HINT_COLOR,
               height: 0.5,
             ),
-
           ),
         ],
       ),
@@ -325,22 +305,6 @@ class TermsPolicySectionView extends StatelessWidget {
               )
             ],
           )
-      // Row(
-      //   mainAxisSize: MainAxisSize.min,
-      //   children: [
-      //     TypeText(
-      //       BY_CLICK_ACCEPT,
-      //       PRIMARY_HINT_COLOR,
-      //       TEXT_REGULAR_SMALL,
-      //     ),
-      //     TypeText(
-      //       TERMS_POLICY,
-      //       PRIMARY_HINT_COLOR,
-      //       TEXT_REGULAR,
-      //       isFontWeight: true,
-      //     )
-      //   ],
-      // ),
 
     );
   }

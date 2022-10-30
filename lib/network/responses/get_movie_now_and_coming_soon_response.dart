@@ -9,7 +9,7 @@ part 'get_movie_now_and_coming_soon_response.g.dart';
 @JsonSerializable()
 class MovieListResponse{
   @JsonKey(name: "dates")
-  DateVo? dates;
+  DateVO? dates;
 
   @JsonKey(name: "page")
   int? page;

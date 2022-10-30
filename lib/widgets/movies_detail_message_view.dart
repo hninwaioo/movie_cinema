@@ -10,7 +10,7 @@ class MovieDetailMessageView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(MARGIN_MEDIUM),
-      margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
+      margin: EdgeInsets.symmetric(horizontal: MARGIN_CARD_MEDIUM_2),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(8.0)),
         color: MOVIES_MESSAGE_BACKGROUND
@@ -35,13 +35,14 @@ class MoviesReleaseMessage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TypeText("Releasing in 5 days", Colors.white, TEXT_REGULAR_1X,isFontWeight: true,),
+          TypeText("Releasing in 5 days", Colors.white, TEXT_REGULAR,isFontWeight: true,),
           SizedBox(height: MARGIN_MEDIUM,),
           Text(
             "Get notify as soon as movie\nbooking opens up in your city!",
             style: TextStyle(
+              decoration: TextDecoration.none,
               color: Colors.white,
-              fontSize: TEXT_REGULAR
+              fontSize: 11.5
             ),
           ),
           SizedBox(height: MARGIN_MEDIUM,),
@@ -54,6 +55,7 @@ class MoviesReleaseMessage extends StatelessWidget {
             ),
             label: Text('Set Notification',
             style: TextStyle(
+              decoration: TextDecoration.none,
               color: Colors.black
             ),
             ),

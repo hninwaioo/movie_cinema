@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:movie_cinema/resources/colors.dart';
 import 'package:movie_cinema/widgets/type_text.dart';
 import '../resources/dimens.dart';
-import '../viewsitems/search_movies_items_view.dart';
 
 class SearchMoviesViewPage extends StatelessWidget {
   const SearchMoviesViewPage({Key? key}) : super(key: key);

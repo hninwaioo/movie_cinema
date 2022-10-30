@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:movie_cinema/pages/payment_view_page.dart';
 import 'package:movie_cinema/pages/ticket_detail_view_page.dart';
@@ -8,10 +7,11 @@ import 'package:movie_cinema/resources/strings.dart';
 import 'package:movie_cinema/widgets/type_text.dart';
 import '../data/vos/movie_now_and_coming_soon/movie_vo.dart';
 import '../data/vos/snack/add_snack_list_vo.dart';
-import '../viewsitems/curve_booking_button_view.dart';
+import '../view_items/curve_booking_button_view.dart';
 
 class CheckOutDialogViewPage extends StatefulWidget{
 
+  String? cinemaName;
   MovieVO? mMovieVO;
   int? cinemaDayTimeSlots;
   String? startTime;
@@ -19,6 +19,7 @@ class CheckOutDialogViewPage extends StatefulWidget{
   List<AddSnackListVO>? addSnackListVO;
 
   CheckOutDialogViewPage({
+    required this.cinemaName,
     required this.mMovieVO,
     required this.cinemaDayTimeSlots,
     required this.startTime,
@@ -70,6 +71,7 @@ class _CheckOutDialogViewPageState extends State<CheckOutDialogViewPage> {
                 TicketDetailPage(
                   TICKET_CANCELION_POLICY,
                   TICKET_POLICY,
+                  cinemaName: widget.cinemaName,
                   mMovieVO: widget.mMovieVO,
                   cinemaDayTimeSlots: widget.cinemaDayTimeSlots,
                   startTime: widget.startTime,
@@ -83,6 +85,7 @@ class _CheckOutDialogViewPageState extends State<CheckOutDialogViewPage> {
           GestureDetector(
               onTap: (){
                 _navigateToPaymentScreen(context,
+                widget.cinemaName,
                 widget.mMovieVO,
                 widget.cinemaDayTimeSlots??0,
                 widget.startTime??"",
@@ -103,6 +106,7 @@ class _CheckOutDialogViewPageState extends State<CheckOutDialogViewPage> {
 
   Future<dynamic> _navigateToPaymentScreen(
       BuildContext context,
+      String? cinemaName,
       MovieVO? mMovieVO,
       int cinemaDayTimeSlots,
       String startTime,
@@ -111,6 +115,7 @@ class _CheckOutDialogViewPageState extends State<CheckOutDialogViewPage> {
       ) {
     return Navigator.push(context, MaterialPageRoute(
         builder: (context) => PaymentViewPage(
+          cinemaName: cinemaName,
           mMovieVO: mMovieVO,
           cinemaDayTimeSlots: cinemaDayTimeSlots,
           startTime: startTime,

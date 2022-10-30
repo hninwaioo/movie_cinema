@@ -1,7 +1,10 @@
-import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_cinema/pages/home_navigation_view_page.dart';
+import 'package:movie_cinema/pages/login_view_page.dart';
+import 'package:splashscreen/splashscreen.dart';
+import '../data/model/movie_model.dart';
+import '../data/model/movie_model_impl.dart';
 import '../resources/colors.dart';
-import '../viewsitems/first_banner_view.dart';
 
 class StartViewPage extends StatefulWidget {
 
@@ -10,41 +13,46 @@ class StartViewPage extends StatefulWidget {
 }
 
 class _startViewPageViewState extends State<StartViewPage> {
-  var _position = 0.0;
+
+  MovieModel mMovieModel = MovieModelImpl();
+
+  String? checkToken;
+
+  @override
+  void initState() {
+    super.initState();
+
+    mMovieModel.signInWithPhoneNumberFromDatabase(201)?.then((user) async{
+      if(user.token != null){
+        checkToken = user.token;
+        print("checkToken=>${checkToken}");
+
+      }
+    }).catchError((error){
+      debugPrint(error.toString());
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: double.infinity,
         color: PRIMARY_COLOR,
-      child: Column(
-        children: [
-          Container(
-            height: MediaQuery.of(context).size.height/1.1,
-            child: PageView(
-              onPageChanged: (page){
-                setState((){
-                  _position = page.toDouble();
-                });
-              },
-              children: [
-                FirstBannerView(),
-                FirstBannerView(),
-                FirstBannerView(),
-                FirstBannerView()
-              ],
-            ),
-          ),
-          // SizedBox(height: MARGIN_MEDIUM_2,),
-          Spacer(),
-          DotsIndicator(
-            dotsCount: 4,
-            position: _position,
-            decorator: DotsDecorator(
-                color: HOME_SCREEN_BANNER_DOTS_INACTIVE_COLOR,
-                activeColor: SIGN_PHONE_NUMBER_BUTTON_COLOR
-            ),
-          )
-        ],
-      ),
+      child: Center(
+        child: SplashScreen(
+            seconds: 10,
+            navigateAfterSeconds: (checkToken != null)
+                ?
+            HomeNavigationViewPage():
+            LoginViewPage(),
+
+            image: Image.asset('assets/images/main_logo.png'),
+            photoSize: 200,
+            useLoader: false,
+            backgroundColor: PRIMARY_COLOR
+        ),
+      )
+
     );
   }
 }

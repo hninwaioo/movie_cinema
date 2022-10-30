@@ -1,12 +1,10 @@
-import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_cinema/pages/ticket_list_view_page.dart';
 import 'package:movie_cinema/resources/colors.dart';
-import 'package:movie_cinema/resources/strings.dart';
 import '../data/vos/movie_now_and_coming_soon/movie_vo.dart';
 import '../data/vos/snack/add_snack_list_vo.dart';
 import '../resources/dimens.dart';
-import '../viewsitems/curve_booking_button_view.dart';
+import '../view_items/curve_booking_button_view.dart';
 import '../widgets/type_text.dart';
 import 'check_out_view_page.dart';
 
@@ -73,6 +71,7 @@ class _TicketDetailViewPageState extends State<TicketDetailViewPage> {
 }
 
 class TicketDetailPage extends StatelessWidget {
+  String? cinemaName;
   MovieVO? mMovieVO;
   int? cinemaDayTimeSlots;
   String? startTime;
@@ -82,6 +81,7 @@ class TicketDetailPage extends StatelessWidget {
   List<AddSnackListVO>? addSnackListVO;
 
   TicketDetailPage(this._text,this._btnColor,{
+    required this.cinemaName,
     required this.mMovieVO,
     required this.cinemaDayTimeSlots,
     required this.startTime,
@@ -126,7 +126,7 @@ class TicketDetailPage extends StatelessWidget {
                   SizedBox(height: MARGIN_MEDIUM_2,),
                   Row(
                     children: [
-                      TypeText("JCGV:Junction City", SIGN_PHONE_NUMBER_BUTTON_COLOR, TEXT_REGULAR_1X,isFontWeight: true,),
+                      TypeText(cinemaName??"", SIGN_PHONE_NUMBER_BUTTON_COLOR, TEXT_REGULAR_1X,isFontWeight: true,),
                       TypeText("(Screen 2)", PRIMARY_HINT_COLOR, TEXT_REGULAR,isFontWeight: true,),
                     ],
                   ),
@@ -156,7 +156,6 @@ class TicketDetailPage extends StatelessWidget {
               ),
             ),
           ),
-
 
           Positioned(
             left: 0,

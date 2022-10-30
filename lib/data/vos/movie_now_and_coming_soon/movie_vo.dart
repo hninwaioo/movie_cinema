@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-
 import '../../../persistence/hive_constants.dart';
 import 'collection_vo.dart';
 import 'genres_vo.dart';
@@ -117,6 +116,12 @@ class MovieVO{
   @HiveField(25)
   int? voteCount;
 
+  @HiveField(26)
+  bool? isNowPlayingMovies;
+
+  @HiveField(27)
+  bool? isComingMovies;
+
   MovieVO(
       this.adult,
       this.backDropPath,
@@ -143,10 +148,11 @@ class MovieVO{
       this.title,
       this.video,
       this.voteAverage,
-      this.voteCount);
+      this.voteCount,
+      this.isNowPlayingMovies,
+      this.isComingMovies);
 
   factory MovieVO.fromJson(Map<String,dynamic> json) => _$MovieVOFromJson(json);
-
 
   Map<String,dynamic> toJson() => _$MovieVOToJson(this);
 

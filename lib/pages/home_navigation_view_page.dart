@@ -24,9 +24,22 @@ class _HomeNavigationViewPageState extends State<HomeNavigationViewPage> {
   late int _currentIndex;
   late Widget _currentPage;
 
+  // void checkPreviousSessionAndRedirect() async {
+  //   GetUserSuccessTokenResponse userToken = GetUserSuccessTokenResponse();
+  //   String loginToken = await userToken.token!;
+  //   print("objectToken=>${loginToken}");
+  //   if (loginToken == null) {
+  //     // Navigator.pushNamedAndRemoveUntil(
+  //     //     context, RouteViews.MAIN, (Route<dynamic> route) => false);
+  //     Navigator.pushReplacementNamed(context, '/login');
+  //   }
+  // }
+
+
   @override
   void initState() {
     super.initState();
+
     _page1 =  MoviesPageView();
     _page2 =  TypeText("MMMM",SIGN_PHONE_NUMBER_BUTTON_COLOR,16.0);
     _page3 =  TicketListViewPage();
@@ -49,48 +62,45 @@ class _HomeNavigationViewPageState extends State<HomeNavigationViewPage> {
 
       body: _currentPage,
       bottomNavigationBar:
-             BottomNavigationBar(
-                backgroundColor: PRIMARY_COLOR,
-               type: BottomNavigationBarType.fixed,
-               onTap: (index) {
-                 _changeTab(index);
-                 print(index);
-               },
-               currentIndex: _currentIndex,
+      BottomNavigationBar(
+        backgroundColor: PRIMARY_COLOR,
+        type: BottomNavigationBarType.fixed,
+        onTap: (index) {
+          _changeTab(index);
+          print(index);
+          },
+        currentIndex: _currentIndex,
 
-               items: const <BottomNavigationBarItem>[
-                  BottomNavigationBarItem(
-                    icon: ImageIcon(
-                      AssetImage("assets/images/nav_video.png"),
-                    ),
-                    label: 'Movies',
-
-                  ),
-                  BottomNavigationBarItem(
-                    icon: ImageIcon(
-                      AssetImage("assets/images/nav_cinema.png"),
-                    ),
-                    label: 'Cinema',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: ImageIcon(
-                      AssetImage("assets/images/nav_ticket.png"),
-                    ),
-                    label: 'Ticket',
-                  ),
-                  BottomNavigationBarItem(
-                    // icon: ImageIcon(Icons.airplane_ticket),
-                    icon: ImageIcon(
-                      AssetImage("assets/images/nav_profile.png"),
-                    ),
-                    label: 'Profile',
-                  ) ,
-                ],
-                selectedItemColor: SIGN_PHONE_NUMBER_BUTTON_COLOR,
-                unselectedItemColor: PRIMARY_HINT_COLOR,
-
-              ),
-    
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: ImageIcon(
+              AssetImage("assets/images/nav_video.png"),
+            ),
+            label: 'Movies',
+          ),
+          BottomNavigationBarItem(
+            icon: ImageIcon(
+              AssetImage("assets/images/nav_cinema.png"),
+            ),
+            label: 'Cinema',
+          ),
+          BottomNavigationBarItem(
+            icon: ImageIcon(
+              AssetImage("assets/images/nav_ticket.png"),
+            ),
+            label: 'Ticket',
+          ),
+          BottomNavigationBarItem(
+            // icon: ImageIcon(Icons.airplane_ticket),
+            icon: ImageIcon(
+              AssetImage("assets/images/nav_profile.png"),
+            ),
+            label: 'Profile',
+          ) ,
+        ],
+        selectedItemColor: SIGN_PHONE_NUMBER_BUTTON_COLOR,
+        unselectedItemColor: PRIMARY_HINT_COLOR,
+      ),
     );
   }
 }

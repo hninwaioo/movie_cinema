@@ -1,17 +1,17 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:movie_cinema/network/responses/get_cinema_response.dart';
-import 'package:movie_cinema/network/responses/get_config_response.dart';
-import 'package:movie_cinema/network/the_movie_cinema_api.dart';
+import 'package:movie_cinema/data/vos/cinema/cinema_vo.dart';
+import 'package:movie_cinema/data/vos/cinema_timeslots/config_data_vo.dart';
 import '../data/model/movie_model.dart';
 import '../data/model/movie_model_impl.dart';
 import '../data/vos/banner_vo.dart';
+import '../data/vos/cinema_timeslots/config_value_list_vo.dart';
 import '../data/vos/movie_now_and_coming_soon/movie_vo.dart';
-import '../pages/home_navidation_view_page.dart';
+import '../pages/home_navigation_view_page.dart';
 import '../resources/colors.dart';
 import '../resources/dimens.dart';
-import '../viewsitems/banner_view.dart';
-import '../viewsitems/search_movies_items_view.dart';
+import '../view_items/banner_view.dart';
+import '../view_items/search_movies_items_view.dart';
 
 class MoviesPageView extends StatefulWidget {
   const MoviesPageView({Key? key}) : super(key: key);
@@ -24,8 +24,10 @@ class _MoviesPageViewState extends State<MoviesPageView> {
 
   MovieModel mMovieModel = MovieModelImpl();
 
-  ConfigResponse? _configResponse;
-  CinemaResponse? _cinemaResponse;
+  List<ConfigDataVO>? configDataList;
+  List<ConfigValueListVO>? configValueList;
+
+  List<CinemaVO>? cinemaList;
 
   List<BannerVO>? mBannersList;
   List<MovieVO>? mPlayingMovieList;
@@ -42,72 +44,135 @@ class _MoviesPageViewState extends State<MoviesPageView> {
     super.initState();
 
     /// Banner Movies
-    mMovieModel.getBannerMovies().then((bannerList) {
-      setState(() {
+    // mMovieModel.getBannerMovies().then((bannerList) {
+    //   setState(() {
+    //     mBannersList = bannerList;
+    //     print("mBannerList==<${mBannersList}");
+    //   });
+    // }).catchError((error) {
+    //   debugPrint("ERROR=>>${error.toString()}");
+    // });
+
+    mMovieModel.getBannerMoviesFromDatabase().listen((bannerList){
+      setState((){
         mBannersList = bannerList;
-        print("mBannerList==<${mBannersList}");
       });
-    }).catchError((error) {
+    }).onError((error){
       debugPrint("ERROR=>>${error.toString()}");
     });
 
     playMovies = "NOW";
     _dateVisible = false;
 
-    mMovieModel.getNowPlayingMovies(1).then((movieList) {
+    // mMovieModel.getNowPlayingMovies(1).then((movieList) {
+    //   setState(() {
+    //     mPlayingMovieList = movieList;
+    //     print("mNowPlayingMovieFirst==>${mPlayingMovieList}");
+    //   });
+    // }).catchError((error) {
+    //   debugPrint("ERROR=>${error.toString()}");
+    // });
+
+    /// Now and Coming Soon Movies Database
+    mMovieModel.getNowPlayingMoviesFromDatabase().listen((movieList){
       setState(() {
         mPlayingMovieList = movieList;
-        print("mNowPlayingMovieFirst==>${mPlayingMovieList}");
       });
-    }).catchError((error) {
+    }).onError((error) {
       debugPrint("ERROR=>${error.toString()}");
     });
 
-    mMovieModel.getConfig()?.then((config) {
+    /// getConfig API
+    mMovieModel.getConfig().then((config) {
       setState((){
-        _configResponse = config;
-        print("ConfigList==>${_configResponse}");
+        configDataList = config;
+        List valueList = config?.first.value;
+        configValueList = valueList.map((value) => ConfigValueListVO.fromJson(value)).toList();
+        print("cinemaTimeslotStatusList=${configValueList}");
 
       });
     }).catchError((error){
       debugPrint("Error=>${error.toString()}");
     });
 
-    mMovieModel.getCinemaList()?.then((cinema) {
+    /// getConfig DATABASE
+    mMovieModel.getConfigFromDatabase().listen((config) {
       setState((){
-        _cinemaResponse = cinema;
-        print("CinemaList==>${_cinemaResponse}");
+        configDataList = config;
+        List valueList = config?.first.value;
+        configValueList = valueList.map((value) => ConfigValueListVO.fromJson(value)).toList();
+        print("cinemaTimeslotStatusList=${configValueList}");
+      });
+    }).onError((error){
+      debugPrint("Error=>${error.toString()}");
+    });
+
+    /// getCinemaList API
+    mMovieModel.getCinemaList().then((cinema) {
+      setState((){
+        cinemaList = cinema;
+        // print("CinemaList==>${_cinemaResponse}");
       });
     }).catchError((error){
       debugPrint("Error=>${error.toString()}");
     });
 
+    /// getCinemaList DATABASE
+    mMovieModel.getCinemaListFromDatabase().listen((cinema) {
+      setState((){
+        cinemaList = cinema;
+        print("CinemaList==>${cinema}");
+      });
+    }).onError((error){
+      debugPrint("Error=>${error.toString()}");
+    });
   }
-    void _getNowAndComingSoonMovies(int index) {
+
+  void _getNowAndComingSoonMovies(int index) {
 
       if(index == 0){
         /// Now Playing Movies
-        mMovieModel.getNowPlayingMovies(1).then((movieList) {
+        // mMovieModel.getNowPlayingMovies(1).then((movieList) {
+        //   setState(() {
+        //     mPlayingMovieList = movieList;
+        //     print("mNowPlayingMovie==>${mPlayingMovieList}");
+        //   });
+        // }).catchError((error) {
+        //   debugPrint("ERROR=>${error.toString()}");
+        // });
+
+        /// Now and Coming Soon Movies Database
+        mMovieModel.getNowPlayingMoviesFromDatabase().listen((movieList){
           setState(() {
             mPlayingMovieList = movieList;
-            print("mNowPlayingMovie==>${mPlayingMovieList}");
           });
-        }).catchError((error) {
+        }).onError((error) {
           debugPrint("ERROR=>${error.toString()}");
         });
+
         playMovies = "NOW";
         _dateVisible = false;
 
       }else{
         /// Coming Soon Playing Movies
-        mMovieModel.getComingSoonPlayingMovies(1).then((movieList) {
+        // mMovieModel.getComingSoonPlayingMovies(1).then((movieList) {
+        //   setState(() {
+        //     mPlayingMovieList = movieList;
+        //     print("mComingSoonPlayingMovieList==>${mPlayingMovieList}");
+        //   });
+        // }).catchError((error) {
+        //   debugPrint("ERROR=>${error.toString()}");
+        // });
+
+        /// Now and Coming Soon Movies Database
+        mMovieModel.getComingSoonPlayingMoviesFromDatabase().listen((movieList){
           setState(() {
             mPlayingMovieList = movieList;
-            print("mComingSoonPlayingMovieList==>${mPlayingMovieList}");
           });
-        }).catchError((error) {
+        }).onError((error) {
           debugPrint("ERROR=>${error.toString()}");
         });
+
         playMovies = "COMING";
         _dateVisible = true;
       }
@@ -127,12 +192,15 @@ class _MoviesPageViewState extends State<MoviesPageView> {
         ),
 
         body: SingleChildScrollView(
+
           child: Column(
             children: [
               BannerSectionView(
                 bannerList: mBannersList?.take(5).toList()
                       ),
+
               SizedBox(height: MARGIN_SMALL,),
+
               NowComingMoviesSectionView(
                 genreList: genreList,
                   onTapGenres: (genreId) {
@@ -142,13 +210,15 @@ class _MoviesPageViewState extends State<MoviesPageView> {
               ),
               SizedBox(height: MARGIN_MEDIUM_2,),
               Container(
-                height: MediaQuery
-                    .of(context)
-                    .size
-                    .height / 3,
+                // height: MediaQuery
+                //     .of(context)
+                //     .size
+                //     .height / 3,
                 child: (mPlayingMovieList != null)
                     ?
                 ListView(
+                  physics: NeverScrollableScrollPhysics(), // <– this will disable scroll.
+                  shrinkWrap: true,
                   children: [
                     NowShowingComingMoviesItemsView(
                       movieList: mPlayingMovieList?? [],
@@ -157,8 +227,9 @@ class _MoviesPageViewState extends State<MoviesPageView> {
                       },
                       playMovies: playMovies,
                       dateVisible: _dateVisible,
-                      configResponse: _configResponse!,
-                      cinemaResponse: _cinemaResponse!,
+                      configDataList: configDataList!,
+                      configValueList: configValueList,
+                      cinemaList: cinemaList,
                       // _navigateToMoviesDetailScreen(context,movieId),
                       // onTapMovie: (genreId) => _getNowAndComingSoonMovies(genreId),
                     )
@@ -169,23 +240,9 @@ class _MoviesPageViewState extends State<MoviesPageView> {
               )
             ],
           ),
-          // children: [
-          //   BannerSectionView(),
-          //   SizedBox(height: MARGIN_SMALL,),
-          //   NowComingMoviesSectionView(genreList: genreList,),
-          //   SizedBox(height: MARGIN_MEDIUM_2,),
-          //   Expanded(
-          //     child: ListView(
-          //       children: [
-          //         NowShowingComingMoviesItemsView()
-          //       ],
-          //     ),
-          //   ),
-          // ],
         ),
       );
     }
-
 }
 
 class BannerSectionView extends StatefulWidget {
@@ -291,16 +348,20 @@ class NowShowingComingMoviesItemsView extends StatelessWidget {
   final List<MovieVO> movieList;
   String? playMovies;
   bool dateVisible;
-  ConfigResponse configResponse;
-  CinemaResponse cinemaResponse;
+  // ConfigResponse configResponse;
+  List<ConfigDataVO>? configDataList;
+  List<ConfigValueListVO>? configValueList;
+  // CinemaResponse cinemaResponse;
+  List<CinemaVO>? cinemaList;
 
   NowShowingComingMoviesItemsView({
     required this.onTapMovie,
     required this.movieList,
     required this.playMovies,
     required this.dateVisible,
-    required this.configResponse,
-    required this.cinemaResponse
+    required this.configDataList,
+    required this.configValueList,
+    required this.cinemaList
   });
 
   @override
@@ -330,8 +391,9 @@ class NowShowingComingMoviesItemsView extends StatelessWidget {
               movieList[index],
               playMovies,
                 dateVisible,
-              configResponse,
-              cinemaResponse
+              configDataList,
+                configValueList,
+              cinemaList
             ),
           );
         },

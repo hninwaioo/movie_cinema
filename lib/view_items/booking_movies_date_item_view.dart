@@ -59,19 +59,19 @@ class _BookingAvailableDateViewState extends State<BookingAvailableDateView> {
   void initState(){
     super.initState();
     print("WIDGETCOLOR=>${widget.sevenDaysDateVO?.selectedDate}");
-    if(widget.sevenDaysDateVO?.selectedDate == true){
-      _color = SIGN_PHONE_NUMBER_BUTTON_COLOR;
-    }else{
-      _color = Colors.white;
-    }
+    // if(widget.sevenDaysDateVO?.selectedDate == true){
+    //   _color = SIGN_PHONE_NUMBER_BUTTON_COLOR;
+    // }else{
+    //   _color = Colors.white;
+    // }
 
-    setState((){
-      if(widget.sevenDaysDateVO?.selectedDate == true){
-        _color = SIGN_PHONE_NUMBER_BUTTON_COLOR;
-      }else{
-        _color = Colors.white;
-      }
-    });
+    // setState((){
+    //   if(widget.sevenDaysDateVO?.selectedDate == true){
+    //     _color = SIGN_PHONE_NUMBER_BUTTON_COLOR;
+    //   }else{
+    //     _color = Colors.white;
+    //   }
+    // });
   }
 
   @override

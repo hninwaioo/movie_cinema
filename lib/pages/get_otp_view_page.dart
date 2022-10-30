@@ -1,12 +1,10 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:movie_cinema/resources/colors.dart';
 import 'package:movie_cinema/resources/dimens.dart';
 import 'package:movie_cinema/widgets/type_text.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-
 import '../data/function/show_load_dialog.dart';
 import '../data/model/movie_model.dart';
 import '../data/model/movie_model_impl.dart';
@@ -30,11 +28,53 @@ class _GetOTPViewPageState extends State<GetOTPViewPage> {
   String? _phoneNo;
   String? _otpCode;
 
+  TextEditingController textEditingController = TextEditingController();
+
+  StreamController<ErrorAnimationType>? errorController;
+
+  bool hasError = false;
+  String currentText = "";
+  final formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    errorController = StreamController<ErrorAnimationType>();
+    super.initState();
+  }
+  @override
+  void dispose() {
+    errorController!.close();
+    super.dispose();
+  }
+
+  void _resendOTPCodeRequest(){
+
+    mMovieModel.getOTP(widget.phoneNo??"")?.then((value) {
+      setState((){
+        if(value.code == 200){
+          Navigator.pop(context);
+          Fluttertoast.showToast(
+              msg: "Successfully Resend Code",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: SIGN_PHONE_NUMBER_BUTTON_COLOR,
+              textColor: PRIMARY_HINT_COLOR,
+              fontSize: 16.0
+          );
+        }
+      });
+    }).catchError((error){
+      Navigator.pop(context);
+      debugPrint("ERROR=>${error.toString()}");
+    });
+  }
+
+
   void _signInWithPhoneNumber(String phoneNo,String otpCode){
     phoneNo = widget.phoneNo??"";
-    mMovieModel.signInWithPhoneNumber(phoneNo,"123456")?.then((value) {
-      print("PHONENO==>${phoneNo}");
-      print("OTPCODE==>${otpCode}");
+
+    mMovieModel.signInWithPhoneNumber(phoneNo, otpCode)?.then((value) {
 
       setState((){
         _phoneNo = widget.phoneNo;
@@ -44,7 +84,6 @@ class _GetOTPViewPageState extends State<GetOTPViewPage> {
         if(value.code == 201){
           Navigator.pop(context);
           _navigateToChooseLocationScreen(context);
-          print("Value=>$value");
         }
       });
     }).catchError((error){
@@ -52,7 +91,6 @@ class _GetOTPViewPageState extends State<GetOTPViewPage> {
       debugPrint("ERROR=>${error.toString()}");
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -83,52 +121,76 @@ class _GetOTPViewPageState extends State<GetOTPViewPage> {
                 children: [
                   TypeText(ENTER_OTP_CODE, PRIMARY_HINT_COLOR, TEXT_REGULAR_1X),
                   SizedBox(height: MARGIN_MEDIUM,),
-                  // Row(
-                  //   children: [
-                  //     EnterOTPCodeSectionView(),
-                  //     Spacer(),
-                  //     EnterOTPCodeSectionView(),
-                  //     Spacer(),
-                  //     EnterOTPCodeSectionView(),
-                  //     Spacer(),
-                  //     EnterOTPCodeSectionView(),
-                  //     Spacer(),
-                  //     EnterOTPCodeSectionView(),
-                  //     Spacer(),
-                  //     EnterOTPCodeSectionView()
-                  //   ],
-                  // ),
 
+                  Container(
 
-                  EnterOTPCodeSectionView(otpCode: _otpCode)
-                  // OtpTextField(
-                  //   numberOfFields: 4,
-                  //   borderColor: Color(0xFF512DA8),
-                  //   filled: true,
-                  //   fillColor: Colors.white,
-                  //   focusedBorderColor: PRIMARY_HINT_COLOR,
-                  //   borderRadius: BorderRadius.circular(8.0),
-                  //   fieldWidth: 35.0,
-                  //   //set to true to show as box or false to show as dash
-                  //   showFieldAsBox: true,
-                  //
-                  //   //runs when a code is typed in
-                  //   onCodeChanged: (String code) {
-                  //     //handle validation or checks here
-                  //   },
-                  //   //runs when every textfield is filled
-                  //   onSubmit: (String verificationCode){
-                  //     showDialog(
-                  //         context: context,
-                  //         builder: (context){
-                  //           return AlertDialog(
-                  //             title: Text("Verification Code"),
-                  //             content: Text('Code entered is $verificationCode'),
-                  //           );
-                  //         }
-                  //     );
-                  //   }, // end onSubmit
-                  // ),
+                    child: Form(
+                      key: formKey,
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 0),
+                          child: PinCodeTextField(
+                            appContext: context,
+                            pastedTextStyle: TextStyle(
+                              color: Colors.green.shade600,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            length: 6,
+                        blinkWhenObscuring: true,
+                        animationType: AnimationType.fade,
+                        validator: (v) {
+                          if (v!.length < 6) {
+                            return "I'm from validator";
+                          } else {
+                            return null;
+                          }
+                        },
+                        pinTheme: PinTheme(
+                          shape: PinCodeFieldShape.box,
+                          inactiveFillColor: Colors.white,
+                          selectedFillColor: PRIMARY_HINT_COLOR,
+                          selectedColor: PRIMARY_HINT_COLOR,
+                          inactiveColor: Colors.white,
+                          borderRadius: BorderRadius.circular(5),
+                          fieldHeight: 50,
+                          fieldWidth: 40,
+                          activeFillColor: Colors.white,
+                        ),
+                        cursorColor: Colors.black,
+                        animationDuration: const Duration(milliseconds: 300),
+                        enableActiveFill: true,
+                        errorAnimationController: errorController,
+                        controller: textEditingController,
+                        keyboardType: TextInputType.number,
+                        boxShadows: const [
+                          BoxShadow(
+                            offset: Offset(0, 1),
+                            color: Colors.black12,
+                            blurRadius: 10,
+                          )
+                        ],
+                        onCompleted: (v) {
+                          _otpCode = v;
+                          debugPrint("Completed");
+                        },
+
+                        onChanged: (value) {
+                          debugPrint(value);
+                          setState(() {
+                            _otpCode = value;
+                            print("WidgetOTPValue==>${_otpCode}");
+                          });
+                        },
+                        beforeTextPaste: (text) {
+                          debugPrint("Allowing to paste $text");
+                          //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
+                          //but you can show anything you want here, like your pop up saying wrong paste format or etc
+                          return true;
+                        },
+                      )
+                  ),
+                ),
+              )
 
                 ],
               ),
@@ -141,7 +203,14 @@ class _GetOTPViewPageState extends State<GetOTPViewPage> {
                 children: [
                   TypeText(DONT_SEND_OTP, Colors.white, TEXT_REGULAR_1X),
                   SizedBox(width: MARGIN_SMALL,),
-                  TypeText(RESEND_CODE, SIGN_PHONE_NUMBER_BUTTON_COLOR, TEXT_REGULAR_1X)
+                  GestureDetector(
+                    onTap: (){
+                      showLoginDialog(context);
+                      _resendOTPCodeRequest();
+                    },
+                    child: TypeText(RESEND_CODE, SIGN_PHONE_NUMBER_BUTTON_COLOR, TEXT_REGULAR_1X)
+
+                  )
                 ],
               ),
 
@@ -149,30 +218,48 @@ class _GetOTPViewPageState extends State<GetOTPViewPage> {
 
             GestureDetector(
               onTap: (){
-                showLoginDialog(context);
-                _signInWithPhoneNumber(widget.phoneNo??"",_otpCode??"");
-                // _navigateToChooseLocationScreen(context);
+                if(_otpCode != null && _otpCode?.length == 6) {
+
+                  if(_otpCode != "123456"){
+                    Fluttertoast.showToast(
+                        msg: "Please fill OTP Code correctly!",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Color.fromRGBO(255,0,0,1.0),
+                        textColor: Colors.white,
+                        fontSize: 16.0
+                    );
+                  }else{
+                    showLoginDialog(context);
+                    _signInWithPhoneNumber(widget.phoneNo ?? "", _otpCode ?? "");
+                  }
+
+                }else{
+                  Fluttertoast.showToast(
+                      msg: "Please fill OTP Code completely!",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Color.fromRGBO(255,0,0,1.0),
+                      textColor: Colors.white,
+                      fontSize: 16.0
+                  );
+                }
               },
               child: LoginButtonScreenButtonView(
                 CONFIRM_OTP,
                 SIGN_PHONE_NUMBER_BUTTON_COLOR,
               ),
             ),
-            // LoginButtonScreenButtonView(
-            //   CONFIRM_OTP,
-            //   SIGN_PHONE_NUMBER_BUTTON_COLOR,
-            //   Icon(null),
-            // ),
 
             SizedBox(height: MARGIN_XXLARGE,),
 
             TermsPolicySectionView(),
             SizedBox(height: MARGIN_XLARGE,),
-
           ],
         ),
       ),
-
     );
   }
 
@@ -184,9 +271,12 @@ class _GetOTPViewPageState extends State<GetOTPViewPage> {
   }
 }
 
+
 class EnterOTPCodeSectionView extends StatefulWidget {
+
   String? otpCode;
-  EnterOTPCodeSectionView({this.otpCode});
+  Function (String) signInWithOtp;
+  EnterOTPCodeSectionView({this.otpCode,required this.signInWithOtp});
 
   @override
   State<EnterOTPCodeSectionView> createState() => _EnterOTPCodeSectionViewState();
@@ -195,9 +285,7 @@ class EnterOTPCodeSectionView extends StatefulWidget {
 class _EnterOTPCodeSectionViewState extends State<EnterOTPCodeSectionView> {
 
   TextEditingController textEditingController = TextEditingController();
-  // ..text = "123456";
 
-  // ignore: close_sinks
   StreamController<ErrorAnimationType>? errorController;
 
   bool hasError = false;
@@ -212,7 +300,6 @@ class _EnterOTPCodeSectionViewState extends State<EnterOTPCodeSectionView> {
   @override
   void dispose() {
     errorController!.close();
-
     super.dispose();
   }
   @override
@@ -247,15 +334,12 @@ class _EnterOTPCodeSectionViewState extends State<EnterOTPCodeSectionView> {
                   fontWeight: FontWeight.bold,
                 ),
                 length: 6,
-                // obscureText: true,
-                // obscuringCharacter: '*',
-                // obscuringWidget: const FlutterLogo(
-                //   size: 24,
-                // ),
                 blinkWhenObscuring: true,
                 animationType: AnimationType.fade,
                 validator: (v) {
-                  if (v!.length < 3) {
+                  if (v!.length < 6) {
+                    widget.otpCode = v;
+                    widget.signInWithOtp(v);
                     return "I'm from validator";
                   } else {
                     return null;
@@ -288,9 +372,7 @@ class _EnterOTPCodeSectionViewState extends State<EnterOTPCodeSectionView> {
                 onCompleted: (v) {
                   debugPrint("Completed");
                 },
-                // onTap: () {
-                //   print("Pressed");
-                // },
+
                 onChanged: (value) {
                   debugPrint(value);
                   setState(() {
@@ -306,7 +388,6 @@ class _EnterOTPCodeSectionViewState extends State<EnterOTPCodeSectionView> {
                 },
               )
           ),
-
         ),
     );
   }

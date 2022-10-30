@@ -92,13 +92,13 @@ class _WholeBackgroundState extends State<WholeBackground> {
         print("onTapObject=>${widget.sevenDaysDateVO?.selectedDate}");
         print("onTapObject==>${widget.selectedColor}");
 
-        setState((){
-          if(widget.selectedColor == true){
-            _color = SIGN_PHONE_NUMBER_BUTTON_COLOR;
-          }else{
-            _color = Colors.white;
-          }
-        });
+        // setState((){
+        //   if(widget.selectedColor == true){
+        //     _color = SIGN_PHONE_NUMBER_BUTTON_COLOR;
+        //   }else{
+        //     _color = Colors.white;
+        //   }
+        // });
       },
       child:  Container(
         width: 130,
@@ -114,7 +114,7 @@ class _WholeBackgroundState extends State<WholeBackground> {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                     // color: _color
-                    color: widget.selectedColor == false ? Colors.white : SIGN_PHONE_NUMBER_BUTTON_COLOR
+                    color : widget.sevenDaysDateVO?.selectedDate == false ? Colors.white : SIGN_PHONE_NUMBER_BUTTON_COLOR
                 ),
               ),
             ),

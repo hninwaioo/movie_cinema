@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:movie_cinema/network/responses/get_cinema_response.dart';
 import 'package:movie_cinema/network/responses/get_config_response.dart';
+import '../data/vos/cinema/cinema_vo.dart';
+import '../data/vos/cinema_timeslots/config_data_vo.dart';
+import '../data/vos/cinema_timeslots/config_value_list_vo.dart';
 import '../data/vos/movie_now_and_coming_soon/movie_vo.dart';
 import '../network/api_constant.dart';
 import '../pages/movies_detail_page.dart';
@@ -14,9 +17,15 @@ class SearchMoviesItemsView extends StatefulWidget {
   final MovieVO mMovie;
   String? playMovies;
   bool dateVisible;
-  ConfigResponse configResponse;
-  CinemaResponse cinemaResponse;
-  SearchMoviesItemsView(this.onTapMovie,this.mMovie,this.playMovies,this.dateVisible,this.configResponse,this.cinemaResponse);
+  // ConfigResponse configResponse;
+  // CinemaResponse cinemaResponse;
+
+  // ConfigResponse configResponse;
+  List<ConfigDataVO>? configDataList;
+  List<ConfigValueListVO>? configValueList;
+  // CinemaResponse cinemaResponse;
+  List<CinemaVO>? cinemaList;
+  SearchMoviesItemsView(this.onTapMovie,this.mMovie,this.playMovies,this.dateVisible,this.configDataList,this.configValueList,this.cinemaList);
 
   @override
   State<SearchMoviesItemsView> createState() => _SearchMoviesItemsViewState();
@@ -45,7 +54,7 @@ class _SearchMoviesItemsViewState extends State<SearchMoviesItemsView> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        _navigateToMoviesDetailScreen(context,widget.mMovie.id??0,widget.playMovies??"",widget.configResponse,widget.cinemaResponse);
+        _navigateToMoviesDetailScreen(context,widget.mMovie.id??0,widget.playMovies??"",widget.configDataList??[],widget.configValueList??[],widget.cinemaList??[]);
       },
       child: Container(
         height: 400,
@@ -112,9 +121,9 @@ class _SearchMoviesItemsViewState extends State<SearchMoviesItemsView> {
 
   }
 
-  Future<dynamic> _navigateToMoviesDetailScreen(BuildContext context, int movieId,String playMovies, ConfigResponse configResponse, CinemaResponse cinemaResponse) {
+  Future<dynamic> _navigateToMoviesDetailScreen(BuildContext context, int movieId,String playMovies, List<ConfigDataVO> configDataList, List<ConfigValueListVO>? configValueList,List<CinemaVO> cinemaList) {
     return Navigator.push(context, MaterialPageRoute(
-        builder: (context) => MoviesDetailPage(movieId,playMovies, configResponse, cinemaResponse,)
+        builder: (context) => MoviesDetailPage(movieId,playMovies, configDataList, configValueList,cinemaList,)
     )
     );
   }

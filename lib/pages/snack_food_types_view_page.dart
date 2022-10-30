@@ -4,7 +4,6 @@ import 'package:movie_cinema/data/vos/snack/snack_vo.dart';
 import 'package:movie_cinema/resources/colors.dart';
 import 'package:movie_cinema/resources/dimens.dart';
 import 'package:movie_cinema/widgets/type_text.dart';
-
 import '../data/model/movie_model.dart';
 import '../data/model/movie_model_impl.dart';
 import '../data/vos/movie_now_and_coming_soon/movie_vo.dart';
@@ -12,12 +11,14 @@ import '../data/vos/snack/add_snack_list_vo.dart';
 import 'check_out_view_page.dart';
 
 class SnackFoodTypesViewPage extends StatefulWidget {
+  String cinemaName;
   MovieVO? mMovieVO;
   int? cinemaDayTimeSlots;
   String? startTime;
   String? completeDate;
 
   SnackFoodTypesViewPage({
+    required this.cinemaName,
     required this.mMovieVO,
     required this.cinemaDayTimeSlots,
     required this.startTime,
@@ -32,12 +33,11 @@ class _SnackFoodTypesViewPageState extends State<SnackFoodTypesViewPage> {
   MovieModel mMovieModel = MovieModelImpl();
   List<SnackCategoriesVO>? snackCategoriesList;
   List<SnackVO>? snackList;
-  String token = "Bearer 14677|TBdKG0ByjbrAmkHX3317oN1aMljYh1nZK1Ug5M86";
+  String checkToken = "15218|oIfcYpBJNRTPajPqyiCSuSyKFigZusdpDY4Ghj2P";
 
   List<String?> categoriesList = ["All"];
 
   List<AddSnackListVO> addSnackListVO = [];
-  // List<MyItem> myItemsList = new List();
 
   int totalFoodPrice = 0;
 
@@ -45,8 +45,31 @@ class _SnackFoodTypesViewPageState extends State<SnackFoodTypesViewPage> {
   void initState(){
     super.initState();
 
-    mMovieModel.getSnackCategories(token)
+    // mMovieModel.signInWithPhoneNumberFromDatabase(201)?.then((user) {
+    //   if(user.token != null){
+    //     checkToken = user.token;
+    //   }
+    //
+    // }).catchError((error){
+    //   debugPrint(error.toString());
+    // });
+
+    /// getSnackCategories API
+    mMovieModel.getSnackCategories("Bearer ${checkToken}")
     .then((categories){
+      setState((){
+        this.snackCategoriesList = categories;
+        print("object>${snackCategoriesList?.map((e) => e.title).toList()}");
+        // categoriesList.addAll(snackCategoriesList?.map((e) => e.title).toList() as List<String?>);
+        print("Object=>${categoriesList}");
+      });
+    }).catchError((error) {
+      debugPrint("ERROR=>${error.toString()}");
+    });
+
+    /// getSnackCategories DATABASE
+    mMovieModel.getSnackCategoryFromDatabase()
+        .then((categories){
       setState((){
         this.snackCategoriesList = categories;
         print("object>${snackCategoriesList?.map((e) => e.title).toList()}");
@@ -57,8 +80,19 @@ class _SnackFoodTypesViewPageState extends State<SnackFoodTypesViewPage> {
       debugPrint("ERROR=>${error.toString()}");
     });
 
-    mMovieModel.getAllSnack(token)
+    /// getAllSnack API
+    mMovieModel.getAllSnack("Bearer ${checkToken}")
     .then((allSnack){
+      setState((){
+        this.snackList = allSnack;
+      });
+    }).catchError((error){
+      debugPrint("ERROR=>${error.toString()}");
+    });
+
+    /// getAllSnack DataBase
+    mMovieModel.getAllSnackFromDatabase()
+        .then((allSnack){
       setState((){
         this.snackList = allSnack;
       });
@@ -72,7 +106,18 @@ class _SnackFoodTypesViewPageState extends State<SnackFoodTypesViewPage> {
 
     if(genreId == 0){
 
+      /// getAllSnack API
       mMovieModel.getAllSnack(token)
+          .then((allSnack){
+        setState((){
+          this.snackList = allSnack;
+        });
+      }).catchError((error){
+        debugPrint("ERROR=>${error.toString()}");
+      });
+
+      /// getAllSnack DataBase
+      mMovieModel.getAllSnackFromDatabase()
           .then((allSnack){
         setState((){
           this.snackList = allSnack;
@@ -83,6 +128,7 @@ class _SnackFoodTypesViewPageState extends State<SnackFoodTypesViewPage> {
 
     }else {
 
+      /// getAllCategoriesSnack API
       mMovieModel.getCategoriesSnack(token,genreId).then((snackByGenre){
         setState((){
           this.snackList = snackByGenre;
@@ -90,8 +136,17 @@ class _SnackFoodTypesViewPageState extends State<SnackFoodTypesViewPage> {
       }).catchError((error){
         debugPrint(error.toString());
       });
-    }
 
+      /// getAllCategoriesSnack DATABASE
+      mMovieModel.getCategoriesSnackFromDatabase().then((snackByGenre){
+        setState((){
+          this.snackList = snackByGenre;
+          print("SnackList=>${snackList}");
+        });
+      }).catchError((error){
+        debugPrint(error.toString());
+      });
+    }
   }
 
   @override
@@ -113,7 +168,7 @@ class _SnackFoodTypesViewPageState extends State<SnackFoodTypesViewPage> {
                 genreList: categoriesList,
                 onTapGenre: (genreId) {
                   print("GenreId===>${genreId}");
-                  _getSnackByGenreAndRefresh(token,genreId);
+                  _getSnackByGenreAndRefresh("Bearer ${checkToken}",genreId);
                 }
             ),
 
@@ -148,12 +203,6 @@ class _SnackFoodTypesViewPageState extends State<SnackFoodTypesViewPage> {
                           }
 
                         });
-                          // addSnackListVO.add(addSnackList);
-
-                          // var d = addSnackListVO?.map((e) => e.snackName);
-                          // print("objectName=${addSnackListVO?.singleWhere((it) => it.snackName == addSnackList.snackName)}");
-
-
                         }
                     )
                   ],
@@ -162,20 +211,13 @@ class _SnackFoodTypesViewPageState extends State<SnackFoodTypesViewPage> {
                 )
             ),
 
-            // Expanded(
-            //   child: ListView(
-            //     children: [
-            //       FoodItemsView(snackList)
-            //     ],
-            //   ),
-            // ),
-
             SizedBox(height: MARGIN_MEDIUM_LARGE,),
 
               Align(
                   alignment: FractionalOffset.bottomCenter,
 
                     child: FoodChoosedItemsView(
+                      cinemaName: widget.cinemaName,
                       mMovieVO: widget.mMovieVO,
                         cinemaDayTimeSlots: widget.cinemaDayTimeSlots,
                         startTime: widget.startTime,
@@ -458,6 +500,7 @@ class FoodItemsView extends StatelessWidget {
 
 class FoodChoosedItemsView extends StatefulWidget {
 
+  String? cinemaName;
   MovieVO? mMovieVO;
   int? cinemaDayTimeSlots;
   String? startTime;
@@ -467,6 +510,7 @@ class FoodChoosedItemsView extends StatefulWidget {
   List<AddSnackListVO> addSnackListVO;
 
   FoodChoosedItemsView({
+    required this.cinemaName,
     required this.mMovieVO,
     required this.cinemaDayTimeSlots,
     required this.startTime,
@@ -543,6 +587,7 @@ class _FoodChoosedItemsViewState extends State<FoodChoosedItemsView> {
               goToCheck: (){
                 _navigateToCheckOutScreen(
                     context,
+                    widget.cinemaName??"",
                     widget.mMovieVO,
                     widget.cinemaDayTimeSlots??0,
                     widget.startTime??"",
@@ -557,6 +602,7 @@ class _FoodChoosedItemsViewState extends State<FoodChoosedItemsView> {
   }
   Future<dynamic> _navigateToCheckOutScreen(
       BuildContext context,
+      String cinemaName,
       MovieVO? mMovieVO,
       int cinemaDayTimeSlots,
       String startTime,
@@ -565,6 +611,7 @@ class _FoodChoosedItemsViewState extends State<FoodChoosedItemsView> {
       ) {
     return Navigator.push(context, MaterialPageRoute(
         builder: (context) => CheckOutDialogViewPage(
+          cinemaName: cinemaName,
           mMovieVO: mMovieVO,
           cinemaDayTimeSlots: cinemaDayTimeSlots,
           startTime: startTime,

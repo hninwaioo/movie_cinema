@@ -45,10 +45,13 @@ class TicketListViewPage extends StatelessWidget {
 
 class MoviesAboutViewList extends StatelessWidget {
 
+  String? cinemaName;
   MovieVO? movieVO;
   String? completeDate;
   String? startTime;
-  MoviesAboutViewList({required this.movieVO,
+  MoviesAboutViewList({
+    required this.cinemaName,
+    required this.movieVO,
     required this.completeDate,
     required this.startTime});
 
@@ -60,7 +63,7 @@ class MoviesAboutViewList extends StatelessWidget {
       },
       child: Container(
 
-        height: MediaQuery.of(context).size.height/1.8,
+        height: MediaQuery.of(context).size.height/1.5,
 
         child: Stack(
           children: [
@@ -86,7 +89,10 @@ class MoviesAboutViewList extends StatelessWidget {
                 child: Column(
                   children: [
                     SizedBox(height: MARGIN_MEDIUM_2,),
-                    MovieAboutImageView(movieVO: movieVO,imageUrl: movieVO?.posterPath??"",),
+                    MovieAboutImageView(
+                      cinemaName: cinemaName,
+                      movieVO: movieVO,
+                      imageUrl: movieVO?.posterPath??"",),
                     SizedBox(height: MARGIN_MEDIUM_2,),
                   ],
                 ),
@@ -191,9 +197,13 @@ class DottedAndContainerView extends StatelessWidget {
 
 class MovieAboutImageView extends StatelessWidget {
 
+  String? cinemaName;
   MovieVO? movieVO;
   String imageUrl;
-  MovieAboutImageView({required this.movieVO, required this.imageUrl});
+  MovieAboutImageView({
+    required this.cinemaName,
+    required this.movieVO,
+    required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -213,9 +223,12 @@ class MovieAboutImageView extends StatelessWidget {
 
               )
           ),
-          SizedBox(width: MARGIN_MEDIUM_LARGE,),
+          SizedBox(width: MARGIN_MEDIUM,),
 
-          MoviesAboutViewsPage(movieVO: movieVO,)
+          MoviesAboutViewsPage(
+            cinemaName: cinemaName,
+            movieVO: movieVO,
+          )
         ],
       ),
     );
@@ -224,8 +237,12 @@ class MovieAboutImageView extends StatelessWidget {
 
 class MoviesAboutViewsPage extends StatelessWidget {
 
+  String? cinemaName;
   MovieVO? movieVO;
-  MoviesAboutViewsPage({required this.movieVO});
+  MoviesAboutViewsPage({
+    required this.cinemaName,
+    required this.movieVO
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -239,12 +256,12 @@ class MoviesAboutViewsPage extends StatelessWidget {
           Row(
             children: [
               TypeText(movieVO?.originalTitle??"", Colors.white, TEXT_REGULAR_1X,isFontWeight: true,),
-              TypeText("(3D)(U/A)", Colors.white, TEXT_REGULAR_1X,isFontWeight: false,),
+              TypeText("(3D)(U/A)", Colors.white, TEXT_REGULAR,isFontWeight: false,),
 
             ],
           ),
           SizedBox(height: MARGIN_MEDIUM,),
-          TypeText("JCGV:Junction City", SIGN_PHONE_NUMBER_BUTTON_COLOR, TEXT_REGULAR_1X,isFontWeight: true,),
+          TypeText(cinemaName??"", SIGN_PHONE_NUMBER_BUTTON_COLOR, TEXT_REGULAR_1X,isFontWeight: true,),
           SizedBox(height: MARGIN_MEDIUM_LARGE,),
           M_TicketView(),
           SizedBox(height: MARGIN_MEDIUM,),

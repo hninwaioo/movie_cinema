@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:movie_cinema/viewsitems/search_movies_items_view.dart';
-import '../pages/movies_detail_page.dart';
 import '../resources/dimens.dart';
-import 'movies_list_view.dart';
 
 class NowShowingMoviesView extends StatelessWidget {
 

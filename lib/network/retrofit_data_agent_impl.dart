@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:movie_cinema/data/vos/banner_vo.dart';
 import 'package:movie_cinema/data/vos/checkout/post_checkout_data_vo.dart';
+import 'package:movie_cinema/data/vos/cinema/cinema_vo.dart';
 import 'package:movie_cinema/data/vos/cities_vo.dart';
 import 'package:movie_cinema/data/vos/movie_now_and_coming_soon/credit_cast_vo.dart';
 import 'package:movie_cinema/data/vos/payment_vo.dart';
@@ -8,7 +9,6 @@ import 'package:movie_cinema/data/vos/snack/snack_categories_vo.dart';
 import 'package:movie_cinema/data/vos/snack/snack_vo.dart';
 import 'package:movie_cinema/network/responses/get_checkout_response.dart';
 import 'package:movie_cinema/network/responses/get_cinema_response.dart';
-import 'package:movie_cinema/network/responses/get_cinema_timeslots_response.dart';
 import 'package:movie_cinema/network/responses/get_config_response.dart';
 import 'package:movie_cinema/network/responses/get_otp_response.dart';
 import 'package:movie_cinema/network/responses/get_set_city_response.dart';
@@ -16,6 +16,8 @@ import 'package:movie_cinema/network/responses/user_success_token_response.dart'
 import 'package:movie_cinema/network/the_movie_cinema_api.dart';
 import 'package:movie_cinema/network/the_movie_cinema_auth_api.dart';
 
+import '../data/vos/cinema_timeslots/cinema_data_vo.dart';
+import '../data/vos/cinema_timeslots/config_data_vo.dart';
 import '../data/vos/movie_now_and_coming_soon/movie_vo.dart';
 import '../data/vos/user_data_vo.dart';
 import 'api_constant.dart';
@@ -30,7 +32,10 @@ class RetrofitDataAgentImpl extends MovieDataAgent{
   String? mToken;
   UserDataVO? _userDataVO;
   ConfigResponse? _configResponse;
+  List<ConfigDataVO>? configDataList;
+
   CinemaResponse? _cinemaResponse;
+  List<CinemaVO>? cinemaList;
 
   static final RetrofitDataAgentImpl _singleton = RetrofitDataAgentImpl._internal();
 
@@ -66,6 +71,7 @@ class RetrofitDataAgentImpl extends MovieDataAgent{
         .map((response) => response.results)
         .first;
   }
+
   @override
   Future<List<MovieVO>?> getNowPlayingMovies(int page) {
     return mApi.getNowPlayingMovies(API_KEY, LANGUAGE_EN_US, page.toString())
@@ -132,31 +138,33 @@ class RetrofitDataAgentImpl extends MovieDataAgent{
   }
 
   @override
-  Future<ConfigResponse>? getConfig() {
+  Future<List<ConfigDataVO>?> getConfig() {
     return mAuthApi.getConfig()
         .then((config){
           _configResponse = config;
+          configDataList = config.configDataVO;
           print("ConfigResponse==>${_configResponse}");
-          return config;
+          return config.configDataVO;
     });
   }
 
   @override
-  Future<CinemaResponse>? getCinemaList() {
+  Future<List<CinemaVO>?> getCinemaList() {
     return mAuthApi.getCinemaList()
         .then((cinema){
           _cinemaResponse = cinema;
+          cinemaList = cinema.cinemaList;
           print("CinemaResponse==>${_cinemaResponse}");
-          return cinema;
+          return cinema.cinemaList;
     });
   }
 
   @override
-  Future<CinemaTimeslotsResponse>? getCinemaTimeslot(String token, String date) {
+  Future<List<CinemaDataVO>?> getCinemaTimeslot(String token, String date) {
     return mAuthApi.getCinemaDayTimeslots(token, date)
         .then((cinemaTimeslots){
           print("CinemaTimeSlots=>${cinemaTimeslots}");
-          return cinemaTimeslots;
+          return cinemaTimeslots.cinemaDataVO;
     });
   }
 

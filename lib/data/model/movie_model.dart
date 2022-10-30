@@ -1,19 +1,18 @@
 import 'package:movie_cinema/data/vos/banner_vo.dart';
+import 'package:movie_cinema/data/vos/cinema/cinema_vo.dart';
 import 'package:movie_cinema/data/vos/movie_now_and_coming_soon/credit_cast_vo.dart';
 import 'package:movie_cinema/data/vos/snack/snack_categories_vo.dart';
-import 'package:movie_cinema/network/responses/get_cinema_response.dart';
-import 'package:movie_cinema/network/responses/get_cinema_timeslots_response.dart';
-import 'package:movie_cinema/network/responses/get_config_response.dart';
 import '../../network/responses/get_checkout_response.dart';
 import '../../network/responses/get_otp_response.dart';
 import '../../network/responses/user_success_token_response.dart';
 import '../vos/checkout/post_checkout_data_vo.dart';
+import '../vos/cinema_timeslots/cinema_data_vo.dart';
+import '../vos/cinema_timeslots/config_data_vo.dart';
 import '../vos/cities_vo.dart';
 import '../vos/movie_now_and_coming_soon/movie_vo.dart';
 import '../vos/payment_vo.dart';
 import '../vos/snack/snack_vo.dart';
 import '../../network/responses/get_set_city_response.dart';
-
 
 abstract class MovieModel {
 
@@ -31,9 +30,12 @@ abstract class MovieModel {
 
   Future<SetCityResponse>? setCity(String token, int cityId);
 
-  Future<ConfigResponse>? getConfig();
-  Future<CinemaResponse>? getCinemaList();
-  Future<CinemaTimeslotsResponse>? getCinemaTimeslot(String token, String date);
+  Future<List<ConfigDataVO>?> getConfig();
+  // Future<CinemaResponse>? getCinemaList();
+  Future<List<CinemaVO>?> getCinemaList();
+  // Future<CinemaTimeslotsResponse>? getCinemaTimeslot(String token, String date);
+  Future<List<CinemaDataVO>?> getCinemaTimeslot(String token, String date);
+
   Future<List<SnackCategoriesVO>?> getSnackCategories(String token);
   Future<List<SnackVO>?> getAllSnack(String token);
   Future<List<SnackVO>?> getCategoriesSnack(String token, int category_id);
@@ -45,5 +47,25 @@ abstract class MovieModel {
   Future<OTPResponse>? getOTP(String phone);
 
   Future<GetUserSuccessTokenResponse>? signInWithPhoneNumber(String phone, String otp);
+
+  /// DATABASE
+  Future<GetUserSuccessTokenResponse>? signInWithPhoneNumberFromDatabase(int code);
+
+  Stream<List<CitiesVO>?> getCitiesFromDatabase();
+
+  Stream<List<MovieVO>?> getNowPlayingMoviesFromDatabase();
+  Future<MovieVO> getMovieDetailsFromDatabase(int movieId);
+  Stream<List<MovieVO>?> getComingSoonPlayingMoviesFromDatabase();
+  Stream<List<BannerVO>?> getBannerMoviesFromDatabase();
+
+  Future<List<SnackCategoriesVO>?> getSnackCategoryFromDatabase();
+  Future<List<SnackVO>?> getAllSnackFromDatabase();
+  Future<List<SnackVO>?> getCategoriesSnackFromDatabase();
+
+  Stream<List<PaymentVO>?> getPaymentTypesFromDatabase(String token);
+
+  Stream<List<ConfigDataVO>?> getConfigFromDatabase();
+  Stream<List<CinemaVO>?> getCinemaListFromDatabase();
+  Future<List<CinemaDataVO>?> getCinemaTimeslotFromDatabase();
 
 }

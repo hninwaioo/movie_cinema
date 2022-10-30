@@ -64,7 +64,7 @@ class CastView extends StatelessWidget {
             // "https://w7.pngwing.com/pngs/157/256/png-transparent-minions-girl-others-boy-cartoon-fictional-character.png"
               "$IMAGE_BASE_URL${mCreditCastVO?.profile_path}"
           ),
-          radius: 50,
+          radius: 35,
         ),
         SizedBox(height: MARGIN_MEDIUM,),
         Center(

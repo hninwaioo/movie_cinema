@@ -10,6 +10,7 @@ import '../network/api_constant.dart';
 
 class TicketConfirmationViewPage extends StatelessWidget {
 
+  String? cinemaName;
   MovieVO? mMovieVO;
   int? cinemaDayTimeSlots;
   String? startTime;
@@ -17,6 +18,7 @@ class TicketConfirmationViewPage extends StatelessWidget {
   String? scanImage;
 
   TicketConfirmationViewPage({
+    required this.cinemaName,
     required this.mMovieVO,
     required this.cinemaDayTimeSlots,
     required this.startTime,
@@ -37,10 +39,14 @@ class TicketConfirmationViewPage extends StatelessWidget {
 
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(MARGIN_MEDIUM),
+        padding: EdgeInsets.all(MARGIN_SMALL),
         child: Column(
           children: [
-            MoviesAboutViewList(movieVO: mMovieVO,completeDate: completeDate,startTime: startTime,),
+            MoviesAboutViewList(
+              cinemaName: cinemaName,
+              movieVO: mMovieVO,
+              completeDate: completeDate,
+              startTime: startTime,),
             SizedBox(height: MARGIN_XLARGE,),
             ScanQRViewPage(scanImage: scanImage,),
             SizedBox(height: MARGIN_XLARGE,),
@@ -61,7 +67,7 @@ class ScanQRViewPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Image.network("$BASE_AUTH_URL_DIO/$scanImage"),
+        Image.network("$BASE_AUTH_URL_DIO/$scanImage",height: 120,width: 120,),
         SizedBox(height: MARGIN_MEDIUM_2,),
         TypeText("WAG5LP1C", Colors.white, TEXT_REGULAR_3X,isFontWeight: true,),
         SizedBox(height: MARGIN_SMALL,),

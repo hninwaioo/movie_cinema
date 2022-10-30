@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../data/vos/cinema/cinema_vo.dart';
 import '../resources/colors.dart';
 import '../resources/dimens.dart';
-import '../viewsitems/cinema_item_view.dart';
+import '../view_items/cinema_item_view.dart';
 import '../widgets/type_text.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:video_player/video_player.dart';

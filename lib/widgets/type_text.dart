@@ -23,14 +23,17 @@ class TypeText extends StatelessWidget {
       text,
       textAlign: TextAlign.center,
       style: TextStyle(
+          decoration: TextDecoration.none,
           color: text_color,
           fontSize: fontSize,
+
           fontWeight: (isFontWeight)
               ?
               FontWeight.bold
               :
           null
       ),
+
     );
   }
 }

@@ -18,12 +18,17 @@ class PaymentDao {
     await getPaymentBox().putAll(paymentMap);
   }
 
-  List<PaymentVO> getAllPaymentListStream(){
+  List<PaymentVO> getAllPaymentList(){
     if(getAllPaymentTypes() != null && getAllPaymentTypes().isNotEmpty){
       return getAllPaymentTypes().toList();
     }else{
       return[];
     }
+  }
+
+  Stream<List<PaymentVO>> getAllPaymentListStream(){
+    return Stream.value(getAllPaymentTypes()
+        .toList());
   }
 
   Stream<void> getAllPaymentListEventStream(){

@@ -14,8 +14,29 @@ class CinemaTimeslotsDao {
 
   void savedAllCinemaTimeslots(List<CinemaDataVO> cinemaTimeslotsList) async {
     Map<int, CinemaDataVO> cinemaTimeslotsMap = Map.fromIterable(cinemaTimeslotsList,
-        key: (cinemaTimeslots) => cinemaTimeslots.id, value: (cinemaTimeslots) => cinemaTimeslots);
+        key: (cinemaTimeslots) => cinemaTimeslots.date, value: (cinemaTimeslots) => cinemaTimeslots);
     await getCinemaTimeslotsBox().putAll(cinemaTimeslotsMap);
+  }
+
+  // void savedAllTimeslots (List<CinemaDataVO> timeslotsList, String dateKey) async{
+  //   await getCinemaTimeslotsBox().put(dateKey, timeslotsList);
+  // }
+
+  List<CinemaDataVO> getAllCinemaTimeslotsList(){
+    if(getCinemaTimeslots() != null && getCinemaTimeslots().isNotEmpty){
+      return getCinemaTimeslots().toList();
+    }else{
+      return[];
+    }
+  }
+
+  Stream<List<CinemaDataVO>> getAllCinemaTimeslotsListStream(){
+    return Stream.value(getCinemaTimeslots()
+        .toList());
+  }
+
+  Stream<void> getAllCinemaTimeslotsListEventStream(){
+    return getCinemaTimeslotsBox().watch();
   }
 
   List<CinemaDataVO> getCinemaTimeslots(){

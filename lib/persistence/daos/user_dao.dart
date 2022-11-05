@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import '../../data/vos/user_data_vo.dart';
 import '../../network/responses/user_success_token_response.dart';
 import '../hive_constants.dart';
 
@@ -22,6 +23,10 @@ class UserDao {
 
   GetUserSuccessTokenResponse? getUserData (int code) {
     return getUserDataBox().get(code);
+  }
+
+  GetUserSuccessTokenResponse? getUserToken () {
+    return getUserDataBox().get(1);
   }
 
   Box<GetUserSuccessTokenResponse> getUserDataBox(){

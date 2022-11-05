@@ -8,6 +8,7 @@ import 'package:movie_cinema/data/vos/movie_now_and_coming_soon/credit_cast_vo.d
 import 'package:movie_cinema/data/vos/payment_vo.dart';
 import 'package:movie_cinema/data/vos/snack/snack_categories_vo.dart';
 import 'package:movie_cinema/data/vos/snack/snack_vo.dart';
+import 'package:movie_cinema/data/vos/user_data_vo.dart';
 import 'package:movie_cinema/network/responses/get_checkout_response.dart';
 import 'package:movie_cinema/network/responses/get_otp_response.dart';
 import 'package:movie_cinema/network/responses/get_set_city_response.dart';
@@ -31,10 +32,10 @@ import '../vos/cinema_timeslots/config_data_vo.dart';
 import '../vos/movie_now_and_coming_soon/movie_vo.dart';
 import 'package:stream_transform/stream_transform.dart';
 
-
 class MovieModelImpl extends MovieModel {
 
   String? token;
+  // String checkToken = "15289|0sVxvlbUuTZiniDglPeiNcGx3IJOFnZTo2f5uz1D";
   MovieDataAgent mDataAgent = RetrofitDataAgentImpl();
 
   static final MovieModelImpl _singleton = MovieModelImpl._internal();
@@ -165,25 +166,29 @@ class MovieModelImpl extends MovieModel {
   }
 
   @override
-  Future<List<SnackCategoriesVO>?> getSnackCategories(String token) {
-    // return mDataAgent.getSnackCategories(token)
+  Future<List<SnackCategoriesVO>?> getSnackCategories() {
+    return Future.value(mSnackCategoriesDao.getAllSnackCategories());
+
+    // return mDataAgent.getSnackCategories("Bearer ${checkToken}")
     // .then((snackCategoriesList) async {
     //   mSnackCategoriesDao.savedAllSnackCategories(snackCategoriesList??[]);
     //   return Future.value(snackCategoriesList);
     // });
 
-    return mDataAgent.getSnackCategories(token).then((snackCategoriesList) async {
-      List<SnackCategoriesVO>? snackCategories = snackCategoriesList?.map((snack_Categories){
-        return snack_Categories;
-      }).toList();
-      mSnackCategoriesDao.savedAllSnackCategories(snackCategories??[]);
-      // return Future.value(bannerList);
-    });
+    // return mDataAgent.getSnackCategories("Bearer ${checkToken}").then((snackCategoriesList) async {
+    //   List<SnackCategoriesVO>? snackCategories = snackCategoriesList?.map((snack_Categories){
+    //     return snack_Categories;
+    //   }).toList();
+    //   mSnackCategoriesDao.savedAllSnackCategories(snackCategories??[]);
+    //   // return Future.value(bannerList);
+    // });
   }
 
   @override
-  Future<List<SnackVO>?> getAllSnack(String token) {
-    return mDataAgent.getAllSnack(token)
+  Future<List<SnackVO>?> getAllSnack() {
+    return mDataAgent.getAllSnack(this.getTokenFromDatabase()
+        // "Bearer ${checkToken}"
+    )
         .then((snackList) async {
           List<SnackVO>? allSnacks = snackList?.map((allSnackList){
             return allSnackList;
@@ -194,8 +199,10 @@ class MovieModelImpl extends MovieModel {
   }
 
   @override
-  Future<List<SnackVO>?> getCategoriesSnack(String token, int category_id) {
-    return mDataAgent.getCategoriesSnack(token, category_id)
+  Future<List<SnackVO>?> getCategoriesSnack(int category_id) {
+    return mDataAgent.getCategoriesSnack(
+        // "Bearer ${checkToken}"
+      this.getTokenFromDatabase(), category_id)
         .then((categoriesSnackList) async {
           mCategoriesSnackDao.savedAllCategoriesSnack(categoriesSnackList??[]);
           return Future.value(categoriesSnackList);
@@ -235,8 +242,9 @@ class MovieModelImpl extends MovieModel {
   @override
   Future<GetUserSuccessTokenResponse>? signInWithPhoneNumber(String phone, String otp) {
     return mDataAgent.signInWithPhoneNumber(phone, otp)
-    ?.then((userData){
+        ?.then((userData){
       token = userData.token;
+      print("UserToken => ${token}");
       mUserDao.saveUserData(userData);
       return userData;
     });
@@ -248,6 +256,27 @@ class MovieModelImpl extends MovieModel {
     return Future.value(mUserDao.getUserData(code));
   }
 
+  // @override
+  // Future<UserDataVO>? signInWithPhoneNumber(String phone, String otp) {
+  //   return mDataAgent.signInWithPhoneNumber(phone, otp)
+  //   ?.then((userData){
+  //     token = userData.token;
+  //     mUserDao.saveUserData(userData);
+  //     return userData;
+  //   });
+  // }
+
+
+  // @override
+  // Stream<UserDataVO?> signInWithPhoneNumberFromDatabase(int code) {
+  //   // return Future.value(mUserDao.getUserData());
+  //   // this.signInWithPhoneNumber(phone, otp);
+  //   return mUserDao
+  //       .getUserDataEventStream()
+  //       .startWith(mUserDao.getUserDataStream())
+  //       .map((event) => mUserDao.getUserData());
+  // }
+
 /// DATABASE
 
   @override
@@ -257,7 +286,7 @@ class MovieModelImpl extends MovieModel {
     return mCityDao
         .getAllCitiesListEventStream()
         .startWith(mCityDao.getAllCitiesListStream())
-        .map((event) => mCityDao.getAllCitiesListStream());
+        .map((event) => mCityDao.getAllCitiesList());
   }
 
   // @override
@@ -270,8 +299,9 @@ class MovieModelImpl extends MovieModel {
     this.getComingSoonPlayingMovies(1);
     return mMovieDao
         .getAllMoviesEventStream()
+        // ignore: void_checks
         .startWith(mMovieDao.getComingSoonMoviesStream())
-        .map((event) => mMovieDao.getComingSoonMoviesStream());
+        .map((event) => mMovieDao.getComingSoonMovies());
   }
 
   @override
@@ -280,8 +310,9 @@ class MovieModelImpl extends MovieModel {
     this.getNowPlayingMovies(1);
     return mMovieDao
         .getAllMoviesEventStream()
+        // ignore: void_checks
         .startWith(mMovieDao.getNowPlayingMoviesStream())
-        .map((event) => mMovieDao.getNowPlayingMoviesStream());
+        .map((event) => mMovieDao.getNowPlayingMovies());
   }
 
   @override
@@ -291,7 +322,7 @@ class MovieModelImpl extends MovieModel {
     return mBannerDao
         .getAllBannerMoviesEventStream()
         .startWith(mBannerDao.getBannerMoviesStream())
-        .map((event) => mBannerDao.getBannerMoviesStream());
+        .map((event) => mBannerDao.getBannerMovies());
   }
 
   @override
@@ -300,33 +331,43 @@ class MovieModelImpl extends MovieModel {
   }
 
   @override
-  Future<List<SnackCategoriesVO>?> getSnackCategoryFromDatabase() {
-    return Future.value(mSnackCategoriesDao.getAllSnackCategories());
-    // this.getSnackCategories(token);
-    // return mSnackCategoriesDao
-    //     .getAllSnackCategoriesListEventStream()
-    //     .startWith(mSnackCategoriesDao.getAllSnackCategoriesListStream())
-    //     .map((event) => mSnackCategoriesDao.getAllSnackCategoriesListStream());
+  Stream<List<SnackCategoriesVO>?> getSnackCategoryFromDatabase() {
+    // return Future.value(mSnackCategoriesDao.getAllSnackCategories());
+    this.getSnackCategories();
+    return mSnackCategoriesDao
+        .getAllSnackCategoriesListEventStream()
+        .startWith(mSnackCategoriesDao.getAllSnackCategoriesListStream())
+        .map((event) => mSnackCategoriesDao.getAllSnackCategoriesList());
   }
 
   @override
-  Future<List<SnackVO>?> getAllSnackFromDatabase() {
-    return Future.value(mSnackDao.getAllSnacks());
-    // this.getAllSnack(token);
-    // return mSnackDao
-    //     .getAllSnackListEventStream()
-    //     .startWith(mSnackDao.getAllSnackListStream())
-    //     .map((event) => mSnackDao.getAllSnackListStream());
+  Stream<List<SnackVO>?> getAllSnackFromDatabase() {
+    // return Future.value(mSnackDao.getAllSnacks());
+    this.getAllSnack();
+    return mSnackDao
+        .getAllSnackListEventStream()
+        .startWith(mSnackDao.getAllSnackListStream())
+        .map((event) => mSnackDao.getAllSnackList());
   }
 
   @override
-  Future<List<SnackVO>?> getCategoriesSnackFromDatabase() {
-    return Future.value(mCategoriesSnackDao.getAllCategoriesSnack());
-    // this.getCategoriesSnack(token, category_id);
-    // return mCategoriesSnackDao
-    //     .getAllCategoriesSnackEventStream()
-    //     .startWith(mCategoriesSnackDao.getAllCategoriesSnackStream())
-    //     .map((event) => mCategoriesSnackDao.getAllCategoriesSnackStream());
+  Stream<List<SnackVO>?> getCategoriesSnackFromDatabase(int category_id) {
+    // return Future.value(mCategoriesSnackDao.getAllCategoriesSnack());
+    this.getCategoriesSnack(category_id);
+    return mCategoriesSnackDao
+        .getAllCategoriesSnackEventStream()
+        .startWith(mCategoriesSnackDao.getAllCategoriesSnackStream())
+        // .map((event) =>
+        // mCategoriesSnackDao.getAllCategoriesSnackList());
+    .map((event){
+      if(category_id == 0){
+        return mCategoriesSnackDao.getAllCategoriesSnackList();
+      }else{
+        return mCategoriesSnackDao.getAllCategoriesSnackList()
+            .where((snack) => snack.categoryId == category_id)
+            .toList();
+      }
+    });
 
   }
 
@@ -337,7 +378,7 @@ class MovieModelImpl extends MovieModel {
     return mPaymentDao
         .getAllPaymentListEventStream()
         .startWith(mPaymentDao.getAllPaymentListStream())
-        .map((event) => mPaymentDao.getAllPaymentListStream());
+        .map((event) => mPaymentDao.getAllPaymentList());
   }
 
   @override
@@ -347,7 +388,7 @@ class MovieModelImpl extends MovieModel {
     return mCinemaDao
         .getAllCinemasListEventStream()
         .startWith(mCinemaDao.getAllCinemasListStream())
-        .map((event) => mCinemaDao.getAllCinemasListStream());
+        .map((event) => mCinemaDao.getAllCinemasList());
   }
 
   @override
@@ -362,7 +403,11 @@ class MovieModelImpl extends MovieModel {
     return mConfigDao
         .getConfigEventStream()
         .startWith(mConfigDao.getConfigStream())
-        .map((event) => mConfigDao.getConfigStream());
+        .map((event) => mConfigDao.getConfig());
   }
 
+  @override
+  String getTokenFromDatabase() {
+    return "Bearer ${mUserDao.getUserToken()?.token}";
+  }
 }

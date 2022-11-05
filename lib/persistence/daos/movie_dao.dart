@@ -1,6 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:http/http.dart';
-
 import '../../data/vos/movie_now_and_coming_soon/movie_vo.dart';
 import '../hive_constants.dart';
 
@@ -24,7 +22,13 @@ class MovieDao {
     return getMovieBox().watch();
   }
 
-  List<MovieVO> getNowPlayingMoviesStream(){
+  Stream<List<MovieVO>> getNowPlayingMoviesStream(){
+    return Stream.value(getAllMovies()
+        .where((element) => element.isNowPlayingMovies ?? false)
+        .toList());
+  }
+
+  List<MovieVO> getNowPlayingMovies(){
     if(getAllMovies() != null && (getAllMovies().isNotEmpty)){
       return getAllMovies()
           .where((element) => element.isNowPlayingMovies?? false)
@@ -34,7 +38,13 @@ class MovieDao {
     }
   }
 
-  List<MovieVO> getComingSoonMoviesStream(){
+  Stream<List<MovieVO>> getComingSoonMoviesStream(){
+    return Stream.value(getAllMovies()
+        .where((element) => element.isNowPlayingMovies ?? false)
+        .toList());
+  }
+
+  List<MovieVO> getComingSoonMovies(){
     if(getAllMovies() != null && (getAllMovies().isNotEmpty)){
       return getAllMovies()
           .where((element) => element.isComingMovies?? false)

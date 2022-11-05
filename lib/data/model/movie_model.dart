@@ -13,6 +13,7 @@ import '../vos/movie_now_and_coming_soon/movie_vo.dart';
 import '../vos/payment_vo.dart';
 import '../vos/snack/snack_vo.dart';
 import '../../network/responses/get_set_city_response.dart';
+import '../vos/user_data_vo.dart';
 
 abstract class MovieModel {
 
@@ -36,9 +37,9 @@ abstract class MovieModel {
   // Future<CinemaTimeslotsResponse>? getCinemaTimeslot(String token, String date);
   Future<List<CinemaDataVO>?> getCinemaTimeslot(String token, String date);
 
-  Future<List<SnackCategoriesVO>?> getSnackCategories(String token);
-  Future<List<SnackVO>?> getAllSnack(String token);
-  Future<List<SnackVO>?> getCategoriesSnack(String token, int category_id);
+  Future<List<SnackCategoriesVO>?> getSnackCategories();
+  Future<List<SnackVO>?> getAllSnack();
+  Future<List<SnackVO>?> getCategoriesSnack(int category_id);
   Future<List<PaymentVO>?> getPaymentType(String token);
 
   Future<CheckOutResponse>? CheckOutPayment(String token, PostCheckOutDataVO postCheckOutDataVO);
@@ -58,14 +59,16 @@ abstract class MovieModel {
   Stream<List<MovieVO>?> getComingSoonPlayingMoviesFromDatabase();
   Stream<List<BannerVO>?> getBannerMoviesFromDatabase();
 
-  Future<List<SnackCategoriesVO>?> getSnackCategoryFromDatabase();
-  Future<List<SnackVO>?> getAllSnackFromDatabase();
-  Future<List<SnackVO>?> getCategoriesSnackFromDatabase();
+  Stream<List<SnackCategoriesVO>?> getSnackCategoryFromDatabase();
+  Stream<List<SnackVO>?> getAllSnackFromDatabase();
+  Stream<List<SnackVO>?> getCategoriesSnackFromDatabase(int category_id);
 
   Stream<List<PaymentVO>?> getPaymentTypesFromDatabase(String token);
 
   Stream<List<ConfigDataVO>?> getConfigFromDatabase();
   Stream<List<CinemaVO>?> getCinemaListFromDatabase();
   Future<List<CinemaDataVO>?> getCinemaTimeslotFromDatabase();
+
+  String getTokenFromDatabase();
 
 }

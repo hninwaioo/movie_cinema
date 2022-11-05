@@ -81,7 +81,7 @@ class _GetOTPViewPageState extends State<GetOTPViewPage> {
         print("PHONENO===>${_phoneNo}");
 
         _otpCode = otpCode;
-        if(value.code == 201){
+        if(value.token!.isNotEmpty){
           Navigator.pop(context);
           _navigateToChooseLocationScreen(context);
         }

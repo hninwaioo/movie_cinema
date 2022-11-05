@@ -1,3 +1,4 @@
+import 'package:movie_cinema/data/vos/user_data_vo.dart';
 import 'package:movie_cinema/network/responses/get_banner_response.dart';
 import 'package:movie_cinema/network/responses/get_checkout_response.dart';
 import 'package:movie_cinema/network/responses/get_cinema_timeslots_response.dart';

@@ -18,12 +18,17 @@ class SnackCategoriesDao {
     await getSnackCategoriesBox().putAll(snackCategoriesMap);
   }
 
-  List<SnackCategoriesVO> getAllSnackCategoriesListStream(){
+  List<SnackCategoriesVO> getAllSnackCategoriesList(){
     if(getAllSnackCategories() != null && getAllSnackCategories().isNotEmpty){
       return getAllSnackCategories().toList();
     }else{
       return[];
     }
+  }
+
+  Stream<List<SnackCategoriesVO>> getAllSnackCategoriesListStream(){
+    return Stream.value(getAllSnackCategories()
+        .toList());
   }
 
   Stream<void> getAllSnackCategoriesListEventStream(){

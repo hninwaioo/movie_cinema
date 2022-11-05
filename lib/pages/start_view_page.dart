@@ -27,6 +27,10 @@ class _startViewPageViewState extends State<StartViewPage> {
         checkToken = user.token;
         print("checkToken=>${checkToken}");
 
+      }else{
+
+        print("checkToken=>null");
+
       }
     }).catchError((error){
       debugPrint(error.toString());
@@ -41,7 +45,8 @@ class _startViewPageViewState extends State<StartViewPage> {
       child: Center(
         child: SplashScreen(
             seconds: 10,
-            navigateAfterSeconds: (checkToken != null)
+            navigateAfterSeconds:
+            (checkToken != null)
                 ?
             HomeNavigationViewPage():
             LoginViewPage(),

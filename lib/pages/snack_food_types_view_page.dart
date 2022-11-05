@@ -55,95 +55,95 @@ class _SnackFoodTypesViewPageState extends State<SnackFoodTypesViewPage> {
     // });
 
     /// getSnackCategories API
-    mMovieModel.getSnackCategories("Bearer ${checkToken}")
-    .then((categories){
-      setState((){
-        this.snackCategoriesList = categories;
-        print("object>${snackCategoriesList?.map((e) => e.title).toList()}");
-        // categoriesList.addAll(snackCategoriesList?.map((e) => e.title).toList() as List<String?>);
-        print("Object=>${categoriesList}");
-      });
-    }).catchError((error) {
-      debugPrint("ERROR=>${error.toString()}");
-    });
+    // mMovieModel.getSnackCategories()
+    // .then((categories){
+    //   setState((){
+    //     this.snackCategoriesList = categories;
+    //     print("object>${snackCategoriesList?.map((e) => e.title).toList()}");
+    //     // categoriesList.addAll(snackCategoriesList?.map((e) => e.title).toList() as List<String?>);
+    //     print("Object=>${categoriesList}");
+    //   });
+    // }).catchError((error) {
+    //   debugPrint("ERROR=>${error.toString()}");
+    // });
 
     /// getSnackCategories DATABASE
     mMovieModel.getSnackCategoryFromDatabase()
-        .then((categories){
+        .listen((categories){
       setState((){
         this.snackCategoriesList = categories;
         print("object>${snackCategoriesList?.map((e) => e.title).toList()}");
         categoriesList.addAll(snackCategoriesList?.map((e) => e.title).toList() as List<String?>);
         print("Object=>${categoriesList}");
       });
-    }).catchError((error) {
+    }).onError((error) {
       debugPrint("ERROR=>${error.toString()}");
     });
 
     /// getAllSnack API
-    mMovieModel.getAllSnack("Bearer ${checkToken}")
-    .then((allSnack){
-      setState((){
-        this.snackList = allSnack;
-      });
-    }).catchError((error){
-      debugPrint("ERROR=>${error.toString()}");
-    });
+    // mMovieModel.getAllSnack()
+    // .then((allSnack){
+    //   setState((){
+    //     this.snackList = allSnack;
+    //   });
+    // }).catchError((error){
+    //   debugPrint("ERROR=>${error.toString()}");
+    // });
 
     /// getAllSnack DataBase
     mMovieModel.getAllSnackFromDatabase()
-        .then((allSnack){
+        .listen((allSnack){
       setState((){
         this.snackList = allSnack;
       });
-    }).catchError((error){
+    }).onError((error){
       debugPrint("ERROR=>${error.toString()}");
     });
 
   }
 
-  void _getSnackByGenreAndRefresh(String token,int genreId){
+  void _getSnackByGenreAndRefresh(int genreId){
 
     if(genreId == 0){
 
       /// getAllSnack API
-      mMovieModel.getAllSnack(token)
-          .then((allSnack){
-        setState((){
-          this.snackList = allSnack;
-        });
-      }).catchError((error){
-        debugPrint("ERROR=>${error.toString()}");
-      });
+      // mMovieModel.getAllSnack()
+      //     .then((allSnack){
+      //   setState((){
+      //     this.snackList = allSnack;
+      //   });
+      // }).catchError((error){
+      //   debugPrint("ERROR=>${error.toString()}");
+      // });
 
       /// getAllSnack DataBase
       mMovieModel.getAllSnackFromDatabase()
-          .then((allSnack){
+          .listen((allSnack){
         setState((){
           this.snackList = allSnack;
         });
-      }).catchError((error){
+      }).onError((error){
         debugPrint("ERROR=>${error.toString()}");
       });
 
     }else {
 
       /// getAllCategoriesSnack API
-      mMovieModel.getCategoriesSnack(token,genreId).then((snackByGenre){
-        setState((){
-          this.snackList = snackByGenre;
-        });
-      }).catchError((error){
-        debugPrint(error.toString());
-      });
+      // mMovieModel.getCategoriesSnack(genreId).then((snackByGenre){
+      //   setState((){
+      //     this.snackList = snackByGenre;
+      //   });
+      // }).catchError((error){
+      //   debugPrint(error.toString());
+      // });
 
       /// getAllCategoriesSnack DATABASE
-      mMovieModel.getCategoriesSnackFromDatabase().then((snackByGenre){
+      mMovieModel.getCategoriesSnackFromDatabase(genreId).listen((snackByGenre){
         setState((){
           this.snackList = snackByGenre;
           print("SnackList=>${snackList}");
         });
-      }).catchError((error){
+      }).onError((error){
         debugPrint(error.toString());
       });
     }
@@ -168,7 +168,7 @@ class _SnackFoodTypesViewPageState extends State<SnackFoodTypesViewPage> {
                 genreList: categoriesList,
                 onTapGenre: (genreId) {
                   print("GenreId===>${genreId}");
-                  _getSnackByGenreAndRefresh("Bearer ${checkToken}",genreId);
+                  _getSnackByGenreAndRefresh(genreId);
                 }
             ),
 

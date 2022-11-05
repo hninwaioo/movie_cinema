@@ -18,12 +18,17 @@ class CityDao {
     await getCityBox().putAll(cityMap);
   }
 
-  List<CitiesVO> getAllCitiesListStream(){
+  List<CitiesVO> getAllCitiesList(){
     if(getAllCities() != null && getAllCities().isNotEmpty){
       return getAllCities().toList();
     }else{
       return[];
     }
+  }
+
+  Stream<List<CitiesVO>> getAllCitiesListStream(){
+    return Stream.value(getAllCities()
+        .toList());
   }
 
   Stream<void> getAllCitiesListEventStream(){

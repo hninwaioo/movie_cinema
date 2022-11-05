@@ -18,14 +18,20 @@ class BannerDao {
     await getBannerBox().putAll(bannerMap);
   }
 
-  List<BannerVO> getBannerMoviesStream(){
-    if(getAllBannerMovies() != null && getAllBannerMovies().isNotEmpty){
+  Stream<List<BannerVO>?> getBannerMoviesStream(){
+    return Stream.value(getAllBannerMovies()
+        .toList());
+  }
+
+  List<BannerVO> getBannerMovies(){
+    if(getAllBannerMovies() != null && (getAllBannerMovies().isNotEmpty)){
       return getAllBannerMovies()
           .toList();
-    }else{
+    }else {
       return[];
     }
   }
+
   Stream<void> getAllBannerMoviesEventStream(){
     return getBannerBox().watch();
   }

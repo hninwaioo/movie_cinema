@@ -17,12 +17,17 @@ class CinemaDao {
     await getCinemaBox().putAll(cinemaMap);
   }
 
-  List<CinemaVO> getAllCinemasListStream(){
+  List<CinemaVO> getAllCinemasList(){
     if(getAllCinemas() != null && getAllCinemas().isNotEmpty){
       return getAllCinemas().toList();
     }else{
       return[];
     }
+  }
+
+  Stream<List<CinemaVO>> getAllCinemasListStream(){
+    return Stream.value(getAllCinemas()
+        .toList());
   }
 
   Stream<void> getAllCinemasListEventStream(){

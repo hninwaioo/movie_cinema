@@ -2,6 +2,7 @@ import 'package:movie_cinema/data/vos/cities_vo.dart';
 import 'package:movie_cinema/data/vos/movie_now_and_coming_soon/credit_cast_vo.dart';
 import 'package:movie_cinema/data/vos/snack/snack_categories_vo.dart';
 import 'package:movie_cinema/data/vos/snack/snack_vo.dart';
+import 'package:movie_cinema/data/vos/user_data_vo.dart';
 import 'package:movie_cinema/network/responses/get_checkout_response.dart';
 import 'package:movie_cinema/network/responses/user_success_token_response.dart';
 

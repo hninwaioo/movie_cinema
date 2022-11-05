@@ -24,13 +24,14 @@ class UserDataVOAdapter extends TypeAdapter<UserDataVO> {
       fields[4] as int?,
       fields[5] as String?,
       (fields[6] as List?)?.cast<String>(),
+      fields[7] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserDataVO obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -44,7 +45,9 @@ class UserDataVOAdapter extends TypeAdapter<UserDataVO> {
       ..writeByte(5)
       ..write(obj.profileImage)
       ..writeByte(6)
-      ..write(obj.cardList);
+      ..write(obj.cardList)
+      ..writeByte(7)
+      ..write(obj.token);
   }
 
   @override
@@ -70,6 +73,7 @@ UserDataVO _$UserDataVOFromJson(Map<String, dynamic> json) => UserDataVO(
       json['total_expense'] as int?,
       json['profile_image'] as String?,
       (json['cards'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      json['token'] as String?,
     );
 
 Map<String, dynamic> _$UserDataVOToJson(UserDataVO instance) =>
@@ -81,4 +85,5 @@ Map<String, dynamic> _$UserDataVOToJson(UserDataVO instance) =>
       'total_expense': instance.totalExpense,
       'profile_image': instance.profileImage,
       'cards': instance.cardList,
+      'token': instance.token,
     };

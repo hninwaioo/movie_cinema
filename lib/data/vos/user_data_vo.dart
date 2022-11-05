@@ -35,8 +35,11 @@ class UserDataVO {
   @HiveField(6)
   List<String>? cardList;
 
+  @HiveField(7)
+  String? token;
+
   UserDataVO(this.id, this.name, this.email, this.phone,
-      this.totalExpense, this.profileImage, this.cardList);
+      this.totalExpense, this.profileImage, this.cardList,this.token);
 
   factory UserDataVO.fromJson(Map<String,dynamic> json) => _$UserDataVOFromJson(json);
 

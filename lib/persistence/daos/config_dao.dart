@@ -19,12 +19,17 @@ class ConfigDao {
     await getConfigBox().putAll(configMap);
   }
 
-  List<ConfigDataVO> getConfigStream(){
+  List<ConfigDataVO> getAllConfig(){
     if(getConfig() != null && (getConfig().isNotEmpty)){
       return getConfig().toList();
     }else {
       return[];
     }
+  }
+
+  Stream<List<ConfigDataVO>> getConfigStream(){
+    return Stream.value(getConfig()
+        .toList());
   }
 
   Stream<void> getConfigEventStream(){

@@ -152,7 +152,6 @@ class SearchLocationSectionView extends StatelessWidget {
       ),
     );
   }
-
 }
 
 Future<dynamic> _navigateToHomeNavigationScreen(BuildContext context) {
@@ -217,10 +216,7 @@ class _CitiesListSectionViewState extends State<CitiesListSectionView> {
       Navigator.pop(context);
       debugPrint("ERROR=>>${error.toString()}");
     });
-
-
   }
-
 
   @override
   Widget build(BuildContext context) {

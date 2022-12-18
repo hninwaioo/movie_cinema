@@ -208,7 +208,9 @@ class _MoviesPageViewState extends State<MoviesPageView> {
                   _getNowAndComingSoonMovies(genreId);
                 }
               ),
+
               SizedBox(height: MARGIN_MEDIUM_2,),
+
               Container(
                 // height: MediaQuery
                 //     .of(context)

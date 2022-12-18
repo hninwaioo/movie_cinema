@@ -24,18 +24,33 @@ class CastSectionView extends StatelessWidget {
             height: MOVIE_LIST_ITEM_WIDTH,
             child: (castList != null)
             ?
+            // ListView.builder(
+            //     scrollDirection: Axis.horizontal,
+            //     padding: EdgeInsets.only(left: MARGIN_MEDIUM_2),
+            //     itemCount: castList?.length,
+            //     itemBuilder:(BuildContext context, int index){
+            //       return Row(
+            //         children: [
+            //           CastView(mCreditCastVO: castList?[index]),
+            //           SizedBox(width: MARGIN_MEDIUM_2,)
+            //         ],
+            //       );
+            //     }
+            // )
+
             ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.only(left: MARGIN_MEDIUM_2),
-                itemCount: castList?.length,
-                itemBuilder:(BuildContext context, int index){
-                  return Row(
-                    children: [
-                      CastView(mCreditCastVO: castList?[index]),
-                      SizedBox(width: MARGIN_MEDIUM_2,)
-                    ],
-                  );
-                }
+              itemCount: castList?.length,
+              scrollDirection: Axis.horizontal,
+              shrinkWrap: true,
+              itemBuilder: (_, i) => Wrap(
+                direction: Axis.horizontal,
+                spacing: 10.0,
+                runSpacing: 20.0,
+                children: [
+                  CastView(mCreditCastVO: castList?.elementAt(i)),
+                  SizedBox(width: MARGIN_MEDIUM_2,)
+                ],
+              ),
             )
                 :
                 Center(

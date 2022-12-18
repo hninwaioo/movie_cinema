@@ -147,7 +147,6 @@ class _CinemaNameDetailViewState extends State<CinemaNameDetailView> {
               color: PRIMARY_HINT_COLOR,
             ),
             SizedBox(height: MARGIN_MEDIUM_LARGE,),
-
           ],
         ),
       )

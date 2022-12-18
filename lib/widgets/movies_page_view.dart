@@ -399,6 +399,7 @@ class NowShowingComingMoviesItemsView extends StatelessWidget {
             ),
           );
         },
+
       ): Center(
         child: CircularProgressIndicator(),
       )
